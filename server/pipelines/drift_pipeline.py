@@ -8,10 +8,19 @@ from data.synthetic.generate_lifestyle import generate_user
 def detect_drift(df):
     baseline = df.iloc[:30][["sleep_hours", "steps"]]
     model = IForest(contamination=0.15)
-    model.fit(baseline)
+    model.fit(baseline.values)
 
-    df["drift"] = model.predict(df[["sleep_hours", "steps"]])
+    scores = model.decision_function(df[["sleep_hours", "steps"]].values)
+
+    df["drift_score"] = scores
+    df["drift_flag"] = model.predict(df[["sleep_hours", "steps"]].values)
+
     return df
+
+def drift_severity(df):
+    recent = df.tail(7)
+    score = abs(recent["drift_score"].mean())
+    return min(round(score, 2), 1.0)
 
 if __name__ == "__main__":
     df = generate_user()
