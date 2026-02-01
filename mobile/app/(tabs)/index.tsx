@@ -48,9 +48,12 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <View style={styles.profilePic}>
+          <TouchableOpacity 
+            style={styles.profilePic}
+            onPress={() => router.push('/profile')}
+          >
             <Text style={[styles.profileText, { color: colors.text }]}>A</Text>
-          </View>
+          </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Health Intelligence</Text>
           <View style={styles.logoContainer}>
             <View style={[styles.statusDot, backendStatus && styles.statusDotActive]} />
@@ -98,11 +101,20 @@ export default function HomeScreen() {
 
         <View style={styles.signalsGrid}>
           {currentHealthSignals.map((signal: HealthSignal) => (
-            <View key={signal.id} style={[styles.signalCard, { backgroundColor: colors.backgroundCard }]}>
+            <TouchableOpacity
+              key={signal.id}
+              onPress={() => {
+                if (signal.type === 'sleep') router.push('/sleep-intelligence');
+                else if (signal.type === 'activity') router.push('/activity-detail');
+                else if (signal.type === 'recovery') router.push('/recovery-signal');
+              }}
+              style={[styles.signalCard, { backgroundColor: colors.backgroundCard }]}
+              activeOpacity={0.8}
+            >
               <View style={styles.signalIcon}>{getSignalIcon(signal.type)}</View>
               <Text style={[styles.signalLabel, { color: colors.textSecondary }]}>{signal.label}</Text>
               <Text style={[styles.signalValue, { color: colors.text }]}>{signal.value}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 

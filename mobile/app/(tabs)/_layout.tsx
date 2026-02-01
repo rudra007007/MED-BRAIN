@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, TrendingUp, Users, User } from "lucide-react-native";
+import { Home, TrendingUp, Users } from "lucide-react-native";
 import React from "react";
 
 export default function TabLayout() {
@@ -44,13 +44,6 @@ export default function TabLayout() {
           title: "Community",
           tabBarIcon: ({ color }) => <Users size={24} color={color} />,
         }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) => <User size={24} color={color} />,
-        }} 
       />
     </Tabs>
   );
