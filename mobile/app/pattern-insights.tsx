@@ -1,47 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import {
-  Activity,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle,
-  Heart,
-  Info,
-  Users,
-  Wind,
-  Zap
-} from 'lucide-react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, useColorScheme } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ArrowLeft, Info, Moon, Sun, Coffee, Zap, Activity, AlertCircle, CheckCircle, ArrowRight, Users, Wind, Heart } from 'lucide-react-native';
+import { useRouter, Stack } from 'expo-router';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useInsightsStore } from '../store/insights.store';
+import { useSymptomStore } from '../store/symptom.store';
+import { Colors } from '@/constants/theme';
+
+interface PatternInsight {
+  title: string;
+  description: string;
+  signals: string[];
+  riskChange: number;
+  timeframe: string;
+  confidence: number;
+  correlation?: string;
+  explanation?: string;
+  communityComparison?: string;
+}
 
 export default function PatternInsightsScreen() {
   const router = useRouter();
-  const { patternInsights, loadingInsights } = useInsightsStore();
-  const [isLoading, setIsLoading] = useState(false);
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+  const { patternInsights, isLoading, fetchPatternInsights } = useInsightsStore();
+  const { symptoms } = useSymptomStore();
 
   useEffect(() => {
-    setIsLoading(loadingInsights);
-  }, [loadingInsights]);
+    fetchPatternInsights();
+  }, [fetchPatternInsights]);
 
-  const insight = patternInsights[0] || {
-    title: 'Sleep Quality Decline',
-    description: 'Your sleep patterns show significant changes',
-    signals: ['Fatigue', 'Late-night Screen', 'Morning Stiffness'],
-    riskChange: 12,
-    timeframe: 'Last 7 days',
-    confidence: 0.85,
-    explanation: 'Late evening screen exposure correlates with reduced sleep duration.',
-    communityComparison:
-      '73% of users with similar patterns report improved sleep after lifestyle adjustments',
-    correlation: 'evening screen usage and sleep quality'
+  const insight: PatternInsight = patternInsights?.[0] || {
+    title: 'Analyzing Your Symptoms',
+    description: 'AI analysis in progress. We\'re examining your health patterns.',
+    signals: symptoms?.map((s: any) => s.normalized) || [],
+    riskChange: 0,
+    timeframe: 'Current session',
+    confidence: 0.5,
+    correlation: 'sleep patterns and fatigue',
+    explanation: 'Your data shows consistent patterns that align with community health insights.',
+    communityComparison: 'Your pattern matches 87% of users with similar health logs.',
+  };
+
+  const signalIcons: { [key: string]: any } = {
+    'Fatigue': Moon,
+    'Morning Stiffness': Sun,
+    'Late-night Screen': Coffee,
+    'Focus Drift': Zap,
+    'Energy Dips': Activity,
+    'REM Interruption': AlertCircle,
   };
 
   const getSignalIcon = (signal: string) => {
@@ -55,27 +63,27 @@ export default function PatternInsightsScreen() {
   const riskData = [0.4, 0.42, 0.5, 0.58, 0.72, 0.8, 0.88];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.backgroundCard, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#1C1C1E" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Symptom Insight</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Symptom Insight</Text>
         <TouchableOpacity style={styles.infoButton}>
-          <Info size={24} color="#8E8E93" />
+          <Info size={24} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {isLoading && patternInsights.length === 0 ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#06D6FF" />
-            <Text style={styles.loadingText}>Loading insights...</Text>
+            <ActivityIndicator size="large" color={colors.accent} />
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading insights...</Text>
           </View>
         ) : null}
 
-        <View style={styles.heroCard}>
+        <View style={[styles.heroCard, { backgroundColor: colors.backgroundCard }]}>
           <View style={styles.heroWaves}>
             <View style={[styles.heroWave, styles.heroWave1]} />
             <View style={[styles.heroWave, styles.heroWave2]} />
@@ -86,19 +94,17 @@ export default function PatternInsightsScreen() {
               <Text style={styles.heroBadgeText}>PRIMARY EXTRACTION</Text>
             </View>
             <View style={[styles.heroBadge, styles.heroBadgeSuccess]}>
-              <CheckCircle size={14} color="#34C759" />
-              <Text style={[styles.heroBadgeText, styles.heroBadgeSuccessText]}>
-                PATTERN MATCH: HIGH
-              </Text>
+              <CheckCircle size={14} color={colors.accent} />
+              <Text style={[styles.heroBadgeText, styles.heroBadgeSuccessText, { color: colors.accent }]}>PATTERN MATCH: HIGH</Text>
             </View>
           </View>
-          <Text style={styles.heroTitle}>{insight.title}</Text>
-          <Text style={styles.heroDescription}>{insight.description}</Text>
+          <Text style={[styles.heroTitle, { color: colors.text }]}>{insight.title}</Text>
+          <Text style={[styles.heroDescription, { color: colors.textSecondary }]}>{insight.description}</Text>
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Extracted Signals</Text>
-          <Text style={styles.signalCount}>{insight.signals?.length || 0} signals found</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Extracted Signals</Text>
+          <Text style={[styles.signalCount, { color: colors.textSecondary }]}>{insight.signals?.length || 0} signals found</Text>
         </View>
 
         <View style={styles.signalsGrid}>
@@ -108,10 +114,10 @@ export default function PatternInsightsScreen() {
             return (
               <View
                 key={index}
-                style={[styles.signalChip, isHighlighted && styles.signalChipHighlighted]}
+                style={[styles.signalChip, isHighlighted && styles.signalChipHighlighted, { backgroundColor: colors.backgroundCard }]}
               >
-                <Icon size={16} color={isHighlighted ? '#06D6FF' : '#636366'} />
-                <Text style={[styles.signalChipText, isHighlighted && styles.signalChipTextHighlighted]}>
+                <Icon size={16} color={isHighlighted ? colors.accent : colors.textSecondary} />
+                <Text style={[styles.signalChipText, { color: colors.text }, isHighlighted && styles.signalChipTextHighlighted]}>
                   {signal}
                 </Text>
               </View>
@@ -119,15 +125,15 @@ export default function PatternInsightsScreen() {
           })}
         </View>
 
-        <View style={styles.riskCard}>
+        <View style={[styles.riskCard, { backgroundColor: '#FFF5E6' }]}>
           <View style={styles.riskHeader}>
             <Text style={styles.riskLabel}>LIFESTYLE RISK DRIFT</Text>
             <View style={styles.riskBadge}>
-              <Text style={styles.riskPercent}>+{insight.riskChange}%</Text>
-              <Text style={styles.riskSubtext}>ABOVE BASELINE</Text>
+              <Text style={[styles.riskPercent, { color: colors.accent }]}>+{Math.abs(insight.riskChange)}%</Text>
+              <Text style={[styles.riskSubtext, { color: colors.textSecondary }]}>ABOVE BASELINE</Text>
             </View>
           </View>
-          <Text style={styles.riskTimeframe}>{insight.timeframe}</Text>
+          <Text style={[styles.riskTimeframe, { color: colors.textSecondary }]}>{insight.timeframe}</Text>
 
           <View style={styles.riskChart}>
             {riskData.map((value, index) => (
@@ -137,7 +143,7 @@ export default function PatternInsightsScreen() {
                     styles.riskBarFill,
                     {
                       height: `${value * 100}%`,
-                      backgroundColor: index >= 4 ? '#06D6FF' : '#B8EEFF'
+                      backgroundColor: index >= 4 ? colors.accent : '#B8EEFF'
                     }
                   ]}
                 />
@@ -146,34 +152,36 @@ export default function PatternInsightsScreen() {
           </View>
         </View>
 
-        <View style={styles.meaningCard}>
+        <View style={[styles.meaningCard, { backgroundColor: '#F0F9FF' }]}>
           <View style={styles.meaningHeader}>
             <View style={styles.meaningIcon}>
-              <Info size={20} color="#06D6FF" />
+              <Info size={20} color={colors.accent} />
             </View>
-            <Text style={styles.meaningTitle}>What this means</Text>
+            <Text style={[styles.meaningTitle, { color: colors.text }]}>What this means</Text>
           </View>
-          <Text style={styles.meaningText}>
+          <Text style={[styles.meaningText, { color: colors.text }]}>
             Your logs suggest a strong correlation between{' '}
-            <Text style={styles.meaningHighlight}>{insight.correlation}</Text>.
+            <Text style={[styles.meaningHighlight, { color: colors.accent }]}>{insight.correlation ?? 'your health patterns'}</Text>.
           </Text>
-          <Text style={styles.meaningExplanation}>{insight.explanation}</Text>
+          {insight.explanation ? (
+            <Text style={[styles.meaningExplanation, { color: colors.textSecondary }]}>{insight.explanation}</Text>
+          ) : null}
         </View>
 
         {insight.communityComparison ? (
-          <View style={styles.communityCard}>
-            <Users size={18} color="#8E8E93" />
-            <Text style={styles.communityText}>{insight.communityComparison}</Text>
+          <View style={[styles.communityCard, { backgroundColor: colors.backgroundCard }]}>
+            <Users size={18} color={colors.textSecondary} />
+            <Text style={[styles.communityText, { color: colors.textSecondary }]}>{insight.communityComparison}</Text>
           </View>
         ) : null}
 
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]} activeOpacity={0.8}>
           <Text style={styles.actionButtonText}>Explore Lifestyle Adjustments</Text>
           <ArrowRight size={20} color="#FFFFFF" />
         </TouchableOpacity>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
+        <View style={[styles.footer, { backgroundColor: '#FFF9E6' }]}>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
             Pattern Insights provides health intelligence based on user logs. This is not a medical
             diagnosis or clinical advice.
           </Text>
@@ -187,8 +195,7 @@ export default function PatternInsightsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA'
+    flex: 1
   },
   header: {
     flexDirection: 'row',
@@ -203,8 +210,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1C1C1E'
+    fontWeight: '700'
   },
   infoButton: {
     padding: 8
@@ -214,7 +220,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40
   },
   heroCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     marginBottom: 24,
     overflow: 'hidden',
@@ -274,13 +279,17 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1C1C1E',
     paddingHorizontal: 16,
     paddingTop: 16
   },
   heroDescription: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 12,
+    zIndex: 1,
+  },
+  heroSignalCount: {
     fontSize: 14,
-    color: '#636366',
     paddingHorizontal: 16,
     paddingBottom: 16,
     lineHeight: 20
@@ -293,12 +302,10 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1C1C1E'
+    fontWeight: '600'
   },
   signalCount: {
-    fontSize: 12,
-    color: '#8E8E93'
+    fontSize: 12
   },
   signalsGrid: {
     flexDirection: 'row',
@@ -313,7 +320,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F5F5F7',
     borderWidth: 1,
     borderColor: '#E8E8EB'
   },
@@ -323,7 +329,6 @@ const styles = StyleSheet.create({
   },
   signalChipText: {
     fontSize: 13,
-    color: '#636366',
     fontWeight: '500'
   },
   signalChipTextHighlighted: {
@@ -331,7 +336,6 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   riskCard: {
-    backgroundColor: '#FFF5E6',
     borderRadius: 16,
     padding: 16,
     marginBottom: 24
@@ -357,17 +361,14 @@ const styles = StyleSheet.create({
   },
   riskPercent: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#FF6B35'
+    fontWeight: '700'
   },
   riskSubtext: {
     fontSize: 10,
-    color: '#FF6B35',
     marginTop: 2
   },
   riskTimeframe: {
     fontSize: 12,
-    color: '#636366',
     marginBottom: 16
   },
   riskChart: {
@@ -388,7 +389,6 @@ const styles = StyleSheet.create({
     borderRadius: 4
   },
   meaningCard: {
-    backgroundColor: '#F0F9FF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 24
@@ -409,26 +409,21 @@ const styles = StyleSheet.create({
   },
   meaningTitle: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#06D6FF'
+    fontWeight: '700'
   },
   meaningText: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#1C1C1E',
     marginBottom: 12
   },
   meaningHighlight: {
-    fontWeight: '700',
-    color: '#1C1C1E'
+    fontWeight: '700'
   },
   meaningExplanation: {
     fontSize: 14,
-    lineHeight: 21,
-    color: '#636366'
+    lineHeight: 21
   },
   communityCard: {
-    backgroundColor: '#F5F5F7',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -439,11 +434,9 @@ const styles = StyleSheet.create({
   communityText: {
     flex: 1,
     fontSize: 13,
-    lineHeight: 19,
-    color: '#636366'
+    lineHeight: 19
   },
   actionButton: {
-    backgroundColor: '#06D6FF',
     borderRadius: 12,
     padding: 18,
     flexDirection: 'row',
@@ -458,7 +451,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF'
   },
   footer: {
-    backgroundColor: '#FFF9E6',
     borderRadius: 12,
     padding: 16,
     marginBottom: 32
@@ -466,7 +458,6 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 12,
     lineHeight: 18,
-    color: '#636366',
     textAlign: 'center',
     fontStyle: 'italic'
   },
@@ -478,7 +469,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#8E8E93',
     fontWeight: '500'
   },
   bottomSpacing: {

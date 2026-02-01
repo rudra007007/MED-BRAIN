@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  useColorScheme,
-  View
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Alert, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, ArrowRight, CheckCircle, Mic, AlertCircle } from 'lucide-react-native';
-import { Stack, useRouter } from 'expo-router';
+import { ArrowLeft, Mic, ArrowRight, CheckCircle, AlertCircle } from 'lucide-react-native';
+import { useRouter, Stack } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useSymptomStore } from '../store/symptom.store';
 import { useAnalyticsStore } from '../store/analytics.store';
@@ -88,8 +78,8 @@ export default function SymptomInputScreen() {
           />
           <View style={styles.inputFooter}>
             <View style={styles.aiIndicator}>
-              <View style={[styles.aiDot, backendStatus && styles.aiDotActive]} />
-              <Text style={styles.aiText}>
+              <View style={[styles.aiDot, !backendStatus && styles.aiDotOffline]} />
+              <Text style={[styles.aiText, { color: colors.textSecondary }]}>
                 {backendStatus ? 'AI ANALYSIS READY' : 'BACKEND OFFLINE'}
               </Text>
             </View>
@@ -161,7 +151,7 @@ export default function SymptomInputScreen() {
           )}
         </TouchableOpacity>
 
-        <View style={styles.disclaimerBox}>
+        <View style={[styles.disclaimerBox, { backgroundColor: '#1A2942' }]}>
           <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}> 
             NON-DIAGNOSTIC TOOL. NOT A SUBSTITUTE FOR PROFESSIONAL MEDICAL ADVICE. ALWAYS CONSULT A
             PHYSICIAN FOR HEALTH CONCERNS.
@@ -236,13 +226,13 @@ const styles = StyleSheet.create({
     gap: 8
   },
   aiDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#8E8E93'
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#06D6FF',
   },
-  aiDotActive: {
-    backgroundColor: '#06D6FF'
+  aiDotOffline: {
+    opacity: 0.4,
   },
   aiText: {
     fontSize: 12,
@@ -255,6 +245,63 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  quickSelectSection: {
+    marginBottom: 32,
+  },
+  quickSelectLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginBottom: 16,
+  },
+  quickSymptomGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  symptomChip: {
+    backgroundColor: '#1A2942',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#3A3A3C',
+  },
+  symptomChipText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#FFFFFF',
+  },
+  continueButton: {
+    backgroundColor: '#06D6FF',
+    borderRadius: 12,
+    padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 24,
+  },
+  continueButtonDisabled: {
+    backgroundColor: '#1A2942',
+    opacity: 0.5,
+  },
+  continueButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  disclaimerBox: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 32,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: 'center',
+    letterSpacing: 0.3,
   },
   errorBanner: {
     flexDirection: 'row',
@@ -300,58 +347,6 @@ const styles = StyleSheet.create({
   confidenceText: {
     color: '#8E8E93',
     fontSize: 12
-  },
-  quickSelectSection: {
-    marginBottom: 24
-  },
-  quickSelectLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 12
-  },
-  quickSymptomGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10
-  },
-  symptomChip: {
-    borderWidth: 1,
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: '#1A2942'
-  },
-  symptomChipText: {
-    fontSize: 13,
-    fontWeight: '500'
-  },
-  continueButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#06D6FF',
-    paddingVertical: 14,
-    borderRadius: 14,
-    marginBottom: 20
-  },
-  continueButtonDisabled: {
-    opacity: 0.5
-  },
-  continueButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  disclaimerBox: {
-    backgroundColor: '#1A2942',
-    borderRadius: 12,
-    padding: 14
-  },
-  disclaimerText: {
-    fontSize: 11,
-    lineHeight: 16,
-    textAlign: 'center'
   },
   bottomSpacing: {
     height: 30

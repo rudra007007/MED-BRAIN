@@ -5,17 +5,17 @@ import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles } from 'luci
 import { useRouter } from 'expo-router';
 import { currentHealthSignals, riskDriftData, recentIntelligence } from '../../mocks/healthdata';
 import type { HealthSignal } from '../../types/health';
-import { Colors } from '@/constants/theme';
 import { useAnalyticsStore } from '../../store/analytics.store';
 import { useHealthStore } from '../../store/health.store';
 import { useInsightsStore } from '../../store/insights.store';
+import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const { backendStatus, checkBackend } = useAnalyticsStore();
-  const { healthData, fetchHealthData } = useHealthStore();
+  const { fetchHealthData } = useHealthStore();
   const { patternInsights, fetchPatternInsights } = useInsightsStore();
 
   useEffect(() => {
@@ -109,19 +109,18 @@ export default function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>What changed recently</Text>
         </View>
-
-        {patternInsights.length > 0 ? (
+        {patternInsights.length > 0 && (
           <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
             <View style={styles.insightIcon}>
               <Lightbulb size={24} color={colors.accent} />
             </View>
             <View style={styles.insightContent}>
-              <Text style={styles.insightLabel}>LATEST INSIGHT</Text>
-              <Text style={styles.insightTitle}>{patternInsights[0].title}</Text>
-              <Text style={styles.insightDescription}>{patternInsights[0].description}</Text>
+              <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>LATEST INSIGHT</Text>
+              <Text style={[styles.insightTitle, { color: colors.text }]}>{patternInsights[0].title}</Text>
+              <Text style={[styles.insightDescription, { color: colors.textSecondary }]}>{patternInsights[0].description}</Text>
             </View>
           </View>
-        ) : null}
+        )}
 
         <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
           <View style={styles.insightIcon}>
