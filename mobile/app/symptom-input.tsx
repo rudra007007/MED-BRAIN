@@ -1,15 +1,53 @@
+<<<<<<< Updated upstream
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
+=======
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+>>>>>>> Stashed changes
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Mic, ArrowRight } from 'lucide-react-native';
+import { ArrowLeft, Mic, ArrowRight, CheckCircle, AlertCircle } from 'lucide-react-native';
 import { useRouter, Stack } from 'expo-router';
+<<<<<<< Updated upstream
 import { Colors } from '@/constants/theme';
+=======
+import { useSymptomStore } from '../store/symptom.store';
+import { useAnalyticsStore } from '../store/analytics.store';
+>>>>>>> Stashed changes
 
 export default function SymptomInputScreen() {
   const router = useRouter();
+  const { 
+    currentInput, 
+    symptoms, 
+    isLoading, 
+    error,
+    setCurrentInput, 
+    extractSymptoms,
+    clearSymptoms
+  } = useSymptomStore();
+  
+  const { backendStatus, checkBackend } = useAnalyticsStore();
   const [symptomText, setSymptomText] = useState('');
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+
+  useEffect(() => {
+    checkBackend();
+  }, []);
+
+  const handleAnalyze = async () => {
+    if (!symptomText.trim()) return;
+    
+    try {
+      await extractSymptoms(symptomText);
+      if (symptoms.length > 0) {
+        router.push('/pattern-insights');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to analyze symptoms. Please try again.');
+    }
+  };
 
   const quickSymptoms = ['Sharp back pain', 'Fatigue', 'Headache', 'Dizziness'];
 
@@ -40,19 +78,52 @@ export default function SymptomInputScreen() {
             multiline
             numberOfLines={8}
             value={symptomText}
-            onChangeText={setSymptomText}
+            onChangeText={(text) => {
+              setSymptomText(text);
+              setCurrentInput(text);
+            }}
             textAlignVertical="top"
+            editable={!isLoading}
           />
           <View style={styles.inputFooter}>
             <View style={styles.aiIndicator}>
+<<<<<<< Updated upstream
               <View style={[styles.aiDot, { backgroundColor: colors.accent }]} />
               <Text style={[styles.aiText, { color: colors.textSecondary }]}>AI ANALYSIS READY</Text>
+=======
+              <View style={[styles.aiDot, backendStatus && styles.aiDotActive]} />
+              <Text style={styles.aiText}>
+                {backendStatus ? 'AI ANALYSIS READY' : 'BACKEND OFFLINE'}
+              </Text>
+>>>>>>> Stashed changes
             </View>
             <TouchableOpacity style={[styles.micButton, { backgroundColor: '#1A2942' }]}>
               <Mic size={24} color={colors.accent} />
             </TouchableOpacity>
           </View>
         </View>
+
+        {error && (
+          <View style={styles.errorBanner}>
+            <AlertCircle size={20} color="#FF3B30" />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        )}
+
+        {symptoms.length > 0 && (
+          <View style={styles.extractedSection}>
+            <Text style={styles.extractedLabel}>EXTRACTED SYMPTOMS</Text>
+            <View style={styles.extractedList}>
+              {symptoms.map((symptom, index) => (
+                <View key={index} style={styles.extractedChip}>
+                  <CheckCircle size={16} color="#34C759" />
+                  <Text style={styles.extractedText}>{symptom.normalized}</Text>
+                  <Text style={styles.confidenceText}>{Math.round(symptom.confidence * 100)}%</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
         <View style={styles.quickSelectSection}>
           <Text style={[styles.quickSelectLabel, { color: colors.textSecondary }]}>QUICK SELECT</Text>
@@ -71,13 +142,29 @@ export default function SymptomInputScreen() {
         </View>
 
         <TouchableOpacity
-          style={[styles.continueButton, !symptomText && styles.continueButtonDisabled]}
+          style={[styles.continueButton, (!symptomText || isLoading) && styles.continueButtonDisabled]}
           activeOpacity={0.8}
-          disabled={!symptomText}
-          onPress={() => router.push('/pattern-insights')}
+          disabled={!symptomText || isLoading}
+          onPress={handleAnalyze}
         >
+<<<<<<< Updated upstream
           <Text style={[styles.continueButtonText, { color: colors.text }]}>Continue to Analysis</Text>
           <ArrowRight size={20} color={colors.text} />
+=======
+          {isLoading ? (
+            <>
+              <ActivityIndicator color="#FFFFFF" />
+              <Text style={styles.continueButtonText}>Analyzing...</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.continueButtonText}>
+                {symptoms.length > 0 ? 'View Analysis' : 'Analyze Symptoms'}
+              </Text>
+              <ArrowRight size={20} color="#FFFFFF" />
+            </>
+          )}
+>>>>>>> Stashed changes
         </TouchableOpacity>
 
         <View style={styles.disclaimerBox}>
@@ -157,10 +244,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+<<<<<<< Updated upstream
   aiDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
+=======
+  aiDotActive: {
+    backgroundColor: '#34C759',
+>>>>>>> Stashed changes
   },
   aiText: {
     fontSize: 12,
@@ -226,6 +318,59 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 32,
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 20,
+    marginTop: 16,
+  },
+  errorText: {
+    color: '#FF3B30',
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 8,
+    flex: 1,
+  },
+  extractedSection: {
+    marginHorizontal: 20,
+    marginTop: 24,
+  },
+  extractedLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#06D6FF',
+    letterSpacing: 1.2,
+    marginBottom: 12,
+  },
+  extractedList: {
+    gap: 8,
+  },
+  extractedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(52, 199, 89, 0.1)',
+    borderWidth: 1,
+    borderColor: '#34C759',
+    borderRadius: 8,
+    padding: 12,
+  },
+  extractedText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '500',
+    marginLeft: 8,
+    flex: 1,
+  },
+  confidenceText: {
+    color: '#34C759',
+    fontSize: 13,
+    fontWeight: '600',
+  },
   },
   disclaimerText: {
     fontSize: 11,

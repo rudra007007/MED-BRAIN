@@ -32,7 +32,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="insights"
+        name="insight"
         options={{
           title: "Insights",
           tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,

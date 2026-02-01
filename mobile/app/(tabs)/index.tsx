@@ -1,16 +1,39 @@
+<<<<<<< Updated upstream
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
+=======
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+>>>>>>> Stashed changes
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { currentHealthSignals, riskDriftData, recentIntelligence } from '../../mocks/healthdata';
 import type { HealthSignal } from '../../types/health';
+<<<<<<< Updated upstream
 import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+=======
+import { useAnalyticsStore } from '../../store/analytics.store';
+import { useHealthStore } from '../../store/health.store';
+import { useInsightsStore } from '../../store/insights.store';
+
+export default function HomeScreen() {
+  const router = useRouter();
+  const { backendStatus, checkBackend } = useAnalyticsStore();
+  const { healthData, fetchHealthData } = useHealthStore();
+  const { patternInsights, fetchPatternInsights } = useInsightsStore();
+
+  useEffect(() => {
+    checkBackend();
+    fetchHealthData();
+    fetchPatternInsights();
+  }, []);
+>>>>>>> Stashed changes
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -41,7 +64,12 @@ export default function HomeScreen() {
           </View>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Health Intelligence</Text>
           <View style={styles.logoContainer}>
+<<<<<<< Updated upstream
             <Sparkles size={24} color={colors.accent} />
+=======
+            <View style={[styles.statusDot, backendStatus && styles.statusDotActive]} />
+            <Sparkles size={24} color="#06D6FF" />
+>>>>>>> Stashed changes
           </View>
         </View>
 
@@ -97,7 +125,24 @@ export default function HomeScreen() {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>What changed recently</Text>
         </View>
 
+<<<<<<< Updated upstream
         <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
+=======
+        {patternInsights.length > 0 && (
+          <View style={styles.insightCard}>
+            <View style={styles.insightIcon}>
+              <Lightbulb size={24} color="#06D6FF" />
+            </View>
+            <View style={styles.insightContent}>
+              <Text style={styles.insightLabel}>LATEST INSIGHT</Text>
+              <Text style={styles.insightTitle}>{patternInsights[0].title}</Text>
+              <Text style={styles.insightDescription}>{patternInsights[0].description}</Text>
+            </View>
+          </View>
+        )}
+
+        <View style={styles.insightCard}>
+>>>>>>> Stashed changes
           <View style={styles.insightIcon}>
             <Lightbulb size={24} color={colors.accent} />
           </View>
@@ -150,6 +195,21 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  statusDot: {
+    position: 'absolute',
+    top: 2,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#8E8E93',
+    borderWidth: 2,
+    borderColor: '#F2F2F7',
+  },
+  statusDotActive: {
+    backgroundColor: '#34C759',
   },
   greetingSection: {
     marginBottom: 24,
@@ -315,6 +375,24 @@ const styles = StyleSheet.create({
   },
   insightContent: {
     flex: 1,
+  },
+  insightLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#8E8E93',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  insightTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#1C1C1E',
+    marginBottom: 4,
+  },
+  insightDescription: {
+    fontSize: 14,
+    color: '#636366',
+    lineHeight: 20,
   },
   insightText: {
     fontSize: 15,

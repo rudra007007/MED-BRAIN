@@ -1,5 +1,80 @@
 # MED-BRAIN 
-## Project info
+
+## Project Overview
+
+MED-BRAIN is an AI-powered health monitoring mobile application with intelligent symptom analysis, health drift detection, and personalized insights.
+
+**Tech Stack:**
+- **Frontend:** React Native + Expo (iOS & Android)
+- **State Management:** Zustand
+- **Backend:** Node.js + Express
+- **AI Engine:** Python (Transformers, Biomedical NER)
+- **Data:** In-memory database (ready for MongoDB/PostgreSQL)
+
+## Features
+
+✅ **AI Symptom Extraction** - Biomedical NER model extracts symptoms from natural language
+✅ **Health Drift Detection** - Monitors changes in sleep, activity, and recovery metrics
+✅ **Pattern Insights** - AI-generated insights about your health trends
+✅ **Community Trends** - See how your patterns compare to similar users
+✅ **Real-time Backend** - Full REST API with Python AI integration
+✅ **Zustand State Management** - Clean, reactive state across the app
+
+## Quick Start
+
+### 1. Backend Setup
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+### 2. Frontend Setup
+```bash
+cd mobile
+npm install
+npm start
+```
+
+### 3. Test Integration
+```bash
+cd backend
+npm run test:data
+```
+
+## Project Structure
+
+```
+MED-BRAIN/
+├── backend/              # Node.js REST API
+│   ├── routes/          # API endpoints
+│   ├── services/        # Python integration
+│   └── data/            # Sample data
+├── Engine/              # Python AI models
+│   ├── models/          # NER, symptom graph
+│   └── api_*.py         # API wrappers
+└── mobile/              # React Native app
+    ├── app/             # Screens
+    ├── store/           # Zustand stores
+    └── services/        # API clients
+```
+
+## Documentation
+
+- 📖 **[SETUP.md](SETUP.md)** - Complete setup guide
+- 📖 **[UPDATE_SUMMARY.md](UPDATE_SUMMARY.md)** - Latest changes
+- 📖 **[backend/README.md](backend/README.md)** - API documentation
+- 📖 **[mobile/INTEGRATION.md](mobile/INTEGRATION.md)** - Frontend integration
+
+## API Endpoints
+
+- `POST /api/symptoms/extract` - Extract symptoms with AI
+- `GET /api/insights/:userId` - Get health insights
+- `GET /api/health/data/:userId` - Get health metrics
+- `GET /api/community/trends` - Get community trends
+- `GET /api/status` - Health check
+
+## Project Info
 
 This is a native cross-platform mobile app created with [Rork](https://rork.com)
 
