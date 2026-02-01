@@ -15,7 +15,11 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerBackTitle: "Back" }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="symptom-input" options={{ headerShown: false }} />
-      <Stack.Screen name="pattern-insights" options={{ headerShown: false }} />
+      <Stack.Screen name="pattern-insights" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+      <Stack.Screen name="sleep-intelligence" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+      <Stack.Screen name="activity-detail" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+      <Stack.Screen name="recovery-signal" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+      <Stack.Screen name="profile" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
     </Stack>
   );
 }
