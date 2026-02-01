@@ -3,9 +3,10 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "bunx rork start -p kyqapx6fm896uhbg7gute --tunnel",
-    "start-web": "bunx rork start -p kyqapx6fm896uhbg7gute --web --tunnel",
-    "start-web-dev": "DEBUG=expo* bunx rork start -p kyqapx6fm896uhbg7gute --web --tunnel",
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
     "lint": "expo lint"
   },
   "dependencies": {

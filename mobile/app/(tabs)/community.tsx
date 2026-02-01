@@ -1,20 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingUp, TrendingDown, Activity, Shield } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { communityTrends } from '../../mocks/healthdata';
 import type { CommunityTrend } from '../../types/health';
+import { Colors } from '@/constants/theme';
 
 export default function CommunityScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'rising':
-        return <TrendingUp size={16} color="#FF3B30" />;
+        return <TrendingUp size={16} color={colors.accent} />;
       case 'improving':
-        return <TrendingDown size={16} color="#34C759" />;
+        return <TrendingDown size={16} color={colors.accent} />;
       case 'emerging':
-        return <Activity size={16} color="#FFB800" />;
+        return <Activity size={16} color={colors.accent} />;
       default:
         return null;
     }
@@ -23,13 +27,13 @@ export default function CommunityScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'rising':
-        return '#FF3B30';
+        return colors.accent;
       case 'improving':
-        return '#34C759';
+        return colors.accent;
       case 'emerging':
-        return '#FFB800';
+        return colors.accent;
       default:
-        return '#8E8E93';
+        return colors.accent;
     }
   };
 
@@ -57,20 +61,20 @@ export default function CommunityScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Community Trends</Text>
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterText}>Filter</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Community Trends</Text>
+          <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.backgroundCard, borderColor: colors.border }]}>
+            <Text style={[styles.filterText, { color: colors.text }]}>Filter</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.infoCard}>
-          <Shield size={20} color="#06D6FF" />
+        <View style={[styles.infoCard, { backgroundColor: colors.backgroundAccent }]}>
+          <Shield size={20} color={colors.accent} />
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>Anonymized Regional Data</Text>
-            <Text style={styles.infoText}>
+            <Text style={[styles.infoTitle, { color: colors.text }]}>Anonymized Regional Data</Text>
+            <Text style={[styles.infoText, { color: colors.textSecondary }]}>
               Aggregated signals for community awareness. This is not a diagnostic tool.
             </Text>
           </View>
@@ -78,31 +82,31 @@ export default function CommunityScreen() {
 
         <View style={styles.filtersRow}>
           <View style={styles.filterChip}>
-            <Text style={styles.filterChipText}>Greater London</Text>
+            <Text style={[styles.filterChipText, { color: colors.text }]}>Greater London</Text>
           </View>
           <View style={styles.filterChip}>
-            <Text style={styles.filterChipText}>Past 24h</Text>
+            <Text style={[styles.filterChipText, { color: colors.text }]}>Past 24h</Text>
           </View>
           <View style={styles.filterChip}>
-            <Text style={styles.filterChipText}>All Signals</Text>
+            <Text style={[styles.filterChipText, { color: colors.text }]}>All Signals</Text>
           </View>
         </View>
 
         <View style={styles.mapPlaceholder}>
-          <Text style={styles.mapText}>London</Text>
+          <Text style={[styles.mapText, { color: colors.accent }]}>London</Text>
           <View style={styles.mapOverlay}>
             <View style={[styles.mapLegendItem, { backgroundColor: '#06D6FF' }]}>
-              <Text style={styles.mapLegendText}>Rising Signal</Text>
+              <Text style={[styles.mapLegendText, { color: colors.text }]}>Rising Signal</Text>
             </View>
             <View style={[styles.mapLegendItem, { backgroundColor: '#E5E5EA' }]}>
-              <Text style={styles.mapLegendText}>Stable</Text>
+              <Text style={[styles.mapLegendText, { color: colors.text }]}>Stable</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Early Signal Warnings</Text>
-          <Text style={styles.alertCount}>3 Active Alerts</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Early Signal Warnings</Text>
+          <Text style={[styles.alertCount, { color: colors.textSecondary }]}>3 Active Alerts</Text>
         </View>
 
         {communityTrends.map((trend: CommunityTrend) => {
@@ -119,10 +123,10 @@ export default function CommunityScreen() {
                     {trend.status.toUpperCase().replace('-', ' ')}
                   </Text>
                 </View>
-                <Text style={styles.trendTitle}>{trend.title}</Text>
-                <Text style={styles.trendDescription}>{trend.description}</Text>
+                <Text style={[styles.trendTitle, { color: colors.text }]}>{trend.title}</Text>
+                <Text style={[styles.trendDescription, { color: colors.textSecondary }]}>{trend.description}</Text>
                 <View style={styles.trendAction}>
-                  <Text style={styles.trendActionText}>
+                  <Text style={[styles.trendActionText, { color: colors.accent }]}>
                     {trend.status === 'rising' ? 'View Deep Dive' : trend.status === 'improving' ? 'Details' : 'Compare Lifestyle'}
                   </Text>
                 </View>
@@ -136,12 +140,12 @@ export default function CommunityScreen() {
 
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>SIGNALS ANALYZED</Text>
-            <Text style={styles.statValue}>12.4M +</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>SIGNALS ANALYZED</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>12.4M +</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>DATA INTEGRITY</Text>
-            <Text style={styles.statValue}>Anonymized</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>DATA INTEGRITY</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>Anonymized</Text>
           </View>
         </View>
 
@@ -154,7 +158,6 @@ export default function CommunityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -169,23 +172,18 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   filterButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E5EA',
   },
   filterText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1C1C1E',
   },
   infoCard: {
-    backgroundColor: '#E8F8FF',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -198,13 +196,11 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   infoText: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#636366',
   },
   filtersRow: {
     flexDirection: 'row',
@@ -212,7 +208,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   filterChip: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A2942',
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -222,7 +218,6 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#1C1C1E',
   },
   mapPlaceholder: {
     height: 200,
@@ -237,7 +232,6 @@ const styles = StyleSheet.create({
   mapText: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#06D6FF',
     opacity: 0.3,
   },
   mapOverlay: {
@@ -256,7 +250,6 @@ const styles = StyleSheet.create({
   mapLegendText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -267,15 +260,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   alertCount: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#06D6FF',
   },
   trendCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A2942',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -308,13 +299,11 @@ const styles = StyleSheet.create({
   trendTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginBottom: 8,
   },
   trendDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#636366',
     marginBottom: 12,
   },
   trendAction: {
@@ -323,7 +312,6 @@ const styles = StyleSheet.create({
   trendActionText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#06D6FF',
   },
   trendChart: {
     width: 100,
@@ -338,21 +326,19 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A2942',
     borderRadius: 12,
     padding: 16,
   },
   statLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     letterSpacing: 0.5,
     marginBottom: 8,
   },
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   bottomSpacing: {
     height: 20,

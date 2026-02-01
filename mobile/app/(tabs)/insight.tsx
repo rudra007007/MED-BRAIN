@@ -1,16 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Info, BarChart3, Users } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { trendDataList } from '../../mocks/healthdata';
 import { TrendData } from '../../types/health';
+import { Colors } from '@/constants/theme';
 
 
 
 export default function InsightsScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   const renderMiniChart = (data: number[]) => {
     return (
@@ -59,12 +62,12 @@ export default function InsightsScreen() {
     switch (status) {
       case 'drifting-later':
       case 'drifting-earlier':
-        return '#FFB800';
+        return colors.accent;
       case 'high-variance':
-        return '#FF3B30';
+        return colors.accent;
       case 'stable':
       default:
-        return '#34C759';
+        return colors.accent;
     }
   };
 
@@ -74,7 +77,7 @@ export default function InsightsScreen() {
     return (
       <View key={trend.metric} style={styles.trendCard}>
         <View style={styles.trendHeader}>
-          <Text style={styles.trendLabel}>{trend.label}</Text>
+          <Text style={[styles.trendLabel, { color: colors.text }]}>{trend.label}</Text>
           <View style={[styles.statusBadge, { backgroundColor: `${statusColor}20` }]}>
             <Text style={[styles.statusText, { color: statusColor }]}>
               {trend.statusLabel}
@@ -90,35 +93,35 @@ export default function InsightsScreen() {
               <BarChart3 size={20} color="#06D6FF" />
             </View>
             <View style={styles.changePointContent}>
-              <Text style={styles.changePointTitle}>Change Point Identified</Text>
-              <Text style={styles.changePointDesc}>{trend.changePoint.description}</Text>
+              <Text style={[styles.changePointTitle, { color: colors.text }]}>Change Point Identified</Text>
+              <Text style={[styles.changePointDesc, { color: colors.textSecondary }]}>{trend.changePoint.description}</Text>
             </View>
           </View>
         )}
 
         {trend.description && !trend.changePoint?.detected && (
-          <Text style={styles.trendDescription}>{trend.description}</Text>
+          <Text style={[styles.trendDescription, { color: colors.textSecondary }]}>{trend.description}</Text>
         )}
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <View style={[styles.header, { backgroundColor: colors.backgroundCard, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#1C1C1E" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Lifestyle Drift</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Lifestyle Drift</Text>
         <TouchableOpacity style={styles.infoButton}>
-          <Info size={24} color="#8E8E93" />
+          <Info size={24} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.titleSection}>
-          <Text style={styles.pageTitle}>30-Day Relative Trends</Text>
-          <Text style={styles.pageSubtitle}>
+          <Text style={[styles.pageTitle, { color: colors.text }]}>30-Day Relative Trends</Text>
+          <Text style={[styles.pageSubtitle, { color: colors.textTertiary }]}>
             Comparing current signals to your personal baseline. Highlights indicate significant change
             points where your habits shifted.
           </Text>
@@ -131,10 +134,10 @@ export default function InsightsScreen() {
             <Users size={20} color="#8E8E93" />
           </View>
           <View style={styles.communityContent}>
-            <Text style={styles.communityLabel}>COMMUNITY PULSE</Text>
-            <Text style={styles.communityText}>
+            <Text style={[styles.communityLabel, { color: colors.textSecondary }]}>COMMUNITY PULSE</Text>
+            <Text style={[styles.communityText, { color: colors.text }] }>
               You are currently experiencing a similar &quot;late-shift&quot; drift as{' '}
-              <Text style={styles.communityHighlight}>14% of people</Text> in your city this week.
+              <Text style={[styles.communityHighlight, { color: colors.accent }]}>14% of people</Text> in your city this week.
             </Text>
           </View>
         </View>
@@ -148,7 +151,6 @@ export default function InsightsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   header: {
     flexDirection: 'row',
@@ -156,9 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5EA',
   },
   backButton: {
     width: 40,
@@ -169,7 +169,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1C1C1E',
   },
   infoButton: {
     width: 40,
@@ -187,16 +186,14 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginBottom: 12,
   },
   pageSubtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#636366',
   },
   trendCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1A2942',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -215,7 +212,6 @@ const styles = StyleSheet.create({
   trendLabel: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1C1C1E',
     flex: 1,
   },
   statusBadge: {
@@ -276,7 +272,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   changePointBox: {
-    backgroundColor: '#F0F9FF',
+    backgroundColor: '#0F1D2E',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -288,7 +284,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#E0F4FF',
+    backgroundColor: '#1A2942',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -298,22 +294,19 @@ const styles = StyleSheet.create({
   changePointTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   changePointDesc: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#636366',
   },
   trendDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#8E8E93',
     fontStyle: 'italic',
   },
   communityCard: {
-    backgroundColor: '#F5F5F7',
+    backgroundColor: '#1A2942',
     borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
@@ -325,7 +318,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#E5E5EA',
+    backgroundColor: '#0F1D2E',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -335,18 +328,15 @@ const styles = StyleSheet.create({
   communityLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     letterSpacing: 0.5,
     marginBottom: 6,
   },
   communityText: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#636366',
   },
   communityHighlight: {
     fontWeight: '700',
-    color: '#06D6FF',
   },
   bottomSpacing: {
     height: 20,

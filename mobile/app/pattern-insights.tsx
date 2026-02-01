@@ -1,14 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Info, Moon, Sun, Coffee, Zap, Activity, AlertCircle, CheckCircle, ArrowRight, Users } from 'lucide-react-native';
 import { useRouter, Stack } from 'expo-router';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { patternInsights } from '../mocks/healthdata';
 import type { PatternInsight } from '../types/health';
+import { Colors } from '@/constants/theme';
 
 export default function PatternInsightsScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
   const insight = patternInsights[0] as PatternInsight;
 
   const signalIcons: { [key: string]: any } = {
@@ -28,15 +31,15 @@ export default function PatternInsightsScreen() {
   const riskData = [0.4, 0.42, 0.5, 0.58, 0.72, 0.8, 0.88];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.backgroundCard, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#1C1C1E" />
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Symptom Insight</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Symptom Insight</Text>
         <TouchableOpacity style={styles.infoButton}>
-          <Info size={24} color="#8E8E93" />
+          <Info size={24} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -49,20 +52,20 @@ export default function PatternInsightsScreen() {
           </View>
           <View style={styles.heroBadges}>
             <View style={styles.heroBadge}>
-              <Text style={styles.heroBadgeText}>PRIMARY EXTRACTION</Text>
+              <Text style={[styles.heroBadgeText, { color: '#FFFFFF' }]}>PRIMARY EXTRACTION</Text>
             </View>
             <View style={[styles.heroBadge, styles.heroBadgeSuccess]}>
-              <CheckCircle size={14} color="#34C759" />
-              <Text style={[styles.heroBadgeText, styles.heroBadgeSuccessText]}>PATTERN MATCH: HIGH</Text>
+              <CheckCircle size={14} color={colors.accent} />
+              <Text style={[styles.heroBadgeText, styles.heroBadgeSuccessText, { color: colors.accent }]}>PATTERN MATCH: HIGH</Text>
             </View>
           </View>
-          <Text style={styles.heroTitle}>{insight.title}</Text>
-          <Text style={styles.heroDescription}>{insight.description}</Text>
+          <Text style={[styles.heroTitle, { color: '#FFFFFF' }]}>{insight.title}</Text>
+          <Text style={[styles.heroDescription, { color: '#FFFFFF' }]}>{insight.description}</Text>
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Extracted Signals</Text>
-          <Text style={styles.signalCount}>{insight.signals.length} signals found</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Extracted Signals</Text>
+          <Text style={[styles.signalCount, { color: colors.textSecondary }]}>{insight.signals.length} signals found</Text>
         </View>
 
         <View style={styles.signalsGrid}>
@@ -74,8 +77,8 @@ export default function PatternInsightsScreen() {
                 key={index}
                 style={[styles.signalChip, isHighlighted && styles.signalChipHighlighted]}
               >
-                <Icon size={16} color={isHighlighted ? '#06D6FF' : '#636366'} />
-                <Text style={[styles.signalChipText, isHighlighted && styles.signalChipTextHighlighted]}>
+                <Icon size={16} color={isHighlighted ? colors.accent : colors.textSecondary} />
+                <Text style={[styles.signalChipText, { color: colors.text }, isHighlighted && styles.signalChipTextHighlighted]}>
                   {signal}
                 </Text>
               </View>
@@ -85,13 +88,13 @@ export default function PatternInsightsScreen() {
 
         <View style={styles.riskCard}>
           <View style={styles.riskHeader}>
-            <Text style={styles.riskLabel}>LIFESTYLE RISK DRIFT</Text>
+            <Text style={[styles.riskLabel, { color: colors.textSecondary }]}>LIFESTYLE RISK DRIFT</Text>
             <View style={styles.riskBadge}>
-              <Text style={styles.riskPercent}>+{insight.riskChange}%</Text>
-              <Text style={styles.riskSubtext}>ABOVE BASELINE</Text>
+              <Text style={[styles.riskPercent, { color: colors.accent }]}>+{insight.riskChange}%</Text>
+              <Text style={[styles.riskSubtext, { color: colors.textSecondary }]}>ABOVE BASELINE</Text>
             </View>
           </View>
-          <Text style={styles.riskTimeframe}>{insight.timeframe}</Text>
+          <Text style={[styles.riskTimeframe, { color: colors.text }]}>{insight.timeframe}</Text>
 
           <View style={styles.riskChart}>
             {riskData.map((value, index) => (
@@ -113,31 +116,31 @@ export default function PatternInsightsScreen() {
         <View style={styles.meaningCard}>
           <View style={styles.meaningHeader}>
             <View style={styles.meaningIcon}>
-              <Info size={20} color="#06D6FF" />
+              <Info size={20} color={colors.accent} />
             </View>
-            <Text style={styles.meaningTitle}>What this means</Text>
+            <Text style={[styles.meaningTitle, { color: colors.text }]}>What this means</Text>
           </View>
-          <Text style={styles.meaningText}>
+          <Text style={[styles.meaningText, { color: colors.textSecondary }]}>
             Your logs suggest a strong correlation between{' '}
-            <Text style={styles.meaningHighlight}>{insight.correlation}</Text>.
+            <Text style={[styles.meaningHighlight, { color: colors.accent }]}>{insight.correlation}</Text>.
           </Text>
-          <Text style={styles.meaningExplanation}>{insight.explanation}</Text>
+          <Text style={[styles.meaningExplanation, { color: colors.textSecondary }]}>{insight.explanation}</Text>
         </View>
 
         {insight.communityComparison && (
           <View style={styles.communityCard}>
-            <Users size={18} color="#8E8E93" />
-            <Text style={styles.communityText}>{insight.communityComparison}</Text>
+            <Users size={18} color={colors.textSecondary} />
+            <Text style={[styles.communityText, { color: colors.textSecondary }]}>{insight.communityComparison}</Text>
           </View>
         )}
 
         <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
-          <Text style={styles.actionButtonText}>Explore Lifestyle Adjustments</Text>
+          <Text style={[styles.actionButtonText, { color: colors.text }]}>Explore Lifestyle Adjustments</Text>
           <ArrowRight size={20} color="#FFFFFF" />
         </TouchableOpacity>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
             Pattern Insights provides health intelligence based on user logs. This is not a medical
             diagnosis or clinical advice.
           </Text>
@@ -173,7 +176,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1C1C1E',
   },
   infoButton: {
     width: 40,
@@ -244,22 +246,18 @@ const styles = StyleSheet.create({
   heroBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   heroBadgeSuccessText: {
-    color: '#FFFFFF',
   },
   heroTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#FFFFFF',
     marginBottom: 12,
   },
   heroDescription: {
     fontSize: 15,
     lineHeight: 22,
-    color: 'rgba(255, 255, 255, 0.85)',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -270,12 +268,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   signalCount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#06D6FF',
   },
   signalsGrid: {
     flexDirection: 'row',
@@ -300,14 +296,12 @@ const styles = StyleSheet.create({
   signalChipText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#636366',
   },
   signalChipTextHighlighted: {
-    color: '#06D6FF',
     fontWeight: '600',
   },
   riskCard: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#1A2942',
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
@@ -321,7 +315,6 @@ const styles = StyleSheet.create({
   riskLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     letterSpacing: 1,
   },
   riskBadge: {
@@ -330,18 +323,15 @@ const styles = StyleSheet.create({
   riskPercent: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#06D6FF',
   },
   riskSubtext: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#8E8E93',
     letterSpacing: 0.5,
   },
   riskTimeframe: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
     marginBottom: 20,
   },
   riskChart: {
@@ -382,22 +372,18 @@ const styles = StyleSheet.create({
   meaningTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#06D6FF',
   },
   meaningText: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#1C1C1E',
     marginBottom: 12,
   },
   meaningHighlight: {
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   meaningExplanation: {
     fontSize: 14,
     lineHeight: 21,
-    color: '#636366',
   },
   communityCard: {
     backgroundColor: '#F5F5F7',
@@ -412,7 +398,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     lineHeight: 19,
-    color: '#636366',
   },
   actionButton: {
     backgroundColor: '#06D6FF',
@@ -427,7 +412,6 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   footer: {
     backgroundColor: '#FFF9E6',
@@ -438,7 +422,6 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 12,
     lineHeight: 18,
-    color: '#636366',
     textAlign: 'center',
     fontStyle: 'italic',
   },

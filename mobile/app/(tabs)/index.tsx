@@ -1,13 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { currentHealthSignals, riskDriftData, recentIntelligence } from '../../mocks/healthdata';
 import type { HealthSignal } from '../../types/health';
+import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -30,77 +33,77 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.profilePic}>
-            <Text style={styles.profileText}>A</Text>
+            <Text style={[styles.profileText, { color: colors.text }]}>A</Text>
           </View>
-          <Text style={styles.headerTitle}>Health Intelligence</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Health Intelligence</Text>
           <View style={styles.logoContainer}>
-            <Sparkles size={24} color="#06D6FF" />
+            <Sparkles size={24} color={colors.accent} />
           </View>
         </View>
 
         <View style={styles.greetingSection}>
-          <Text style={styles.greeting}>{getTimeGreeting()}, Alex</Text>
-          <Text style={styles.statusText}>{riskDriftData.message}</Text>
+          <Text style={[styles.greeting, { color: colors.text }]}>{getTimeGreeting()}, Alex</Text>
+          <Text style={[styles.statusText, { color: colors.textSecondary }]}>{riskDriftData.message}</Text>
         </View>
 
         <TouchableOpacity 
-          style={styles.riskCard}
+          style={[styles.riskCard, { backgroundColor: colors.backgroundCard }]}
           activeOpacity={0.9}
           onPress={() => router.push('/pattern-insights')}
         >
-          <View style={styles.riskCardHeader}>
+          <View style={[styles.riskCardHeader, { backgroundColor: colors.backgroundAccent }]}>
             <View style={styles.waveBackground}>
-              <View style={styles.wave} />
-              <View style={[styles.wave, styles.wave2]} />
+              <View style={[styles.wave, { backgroundColor: colors.backgroundAccentSecondary }]} />
+              <View style={[styles.wave, styles.wave2, { backgroundColor: colors.backgroundAccentSecondary }]} />
             </View>
-            <Text style={styles.riskStatus}>Stable</Text>
+            <Text style={[styles.riskStatus, { color: colors.accent }]}>Stable</Text>
             <View style={styles.riskBadge}>
-              <Text style={styles.riskBadgeText}>→ LOW RISK DRIFT</Text>
+              <Text style={[styles.riskBadgeText, { color: colors.accent }]}>→ LOW RISK DRIFT</Text>
             </View>
           </View>
 
           <View style={styles.riskCardContent}>
-            <Text style={styles.aiLabel}>AI ANALYSIS</Text>
-            <Text style={styles.riskTitle}>Risk Drift Indicator</Text>
-            <Text style={styles.riskDescription}>{riskDriftData.description}</Text>
+            <Text style={[styles.aiLabel, { color: colors.textSecondary }]}>AI ANALYSIS</Text>
+            <Text style={[styles.riskTitle, { color: colors.text }]}>Risk Drift Indicator</Text>
+            <Text style={[styles.riskDescription, { color: colors.textSecondary }]}>{riskDriftData.description}</Text>
             <View style={styles.viewButton}>
-              <Text style={styles.viewButtonText}>View Analysis</Text>
+              <Text style={[styles.viewButtonText, { color: '#FFFFFF' }]}>View Analysis</Text>
             </View>
           </View>
         </TouchableOpacity>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Current Health Signals</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Current Health Signals</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/insight')}>
-            <Text style={styles.historyLink}>History</Text>
+            <Text style={[styles.historyLink, { color: colors.accent }]}>History</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.signalsGrid}>
           {currentHealthSignals.map((signal: HealthSignal) => (
-            <View key={signal.id} style={styles.signalCard}>
+            <View key={signal.id} style={[styles.signalCard, { backgroundColor: colors.backgroundCard }]}>
               <View style={styles.signalIcon}>{getSignalIcon(signal.type)}</View>
-              <Text style={styles.signalLabel}>{signal.label}</Text>
-              <Text style={styles.signalValue}>{signal.value}</Text>
+              <Text style={[styles.signalLabel, { color: colors.textSecondary }]}>{signal.label}</Text>
+              <Text style={[styles.signalValue, { color: colors.text }]}>{signal.value}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>What changed recently</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>What changed recently</Text>
         </View>
 
-        <View style={styles.insightCard}>
+        <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
           <View style={styles.insightIcon}>
-            <Lightbulb size={24} color="#06D6FF" />
+            <Lightbulb size={24} color={colors.accent} />
           </View>
           <View style={styles.insightContent}>
-            <Text style={styles.insightText}>{recentIntelligence.message}</Text>
-            <Text style={styles.insightSuggestion}>{recentIntelligence.suggestion}</Text>
+            <Text style={[styles.insightText, { color: colors.text }]}>{recentIntelligence.message}</Text>
+            <Text style={[styles.insightSuggestion, { color: colors.textSecondary }]}>{recentIntelligence.suggestion}</Text>
           </View>
         </View>
 
@@ -113,7 +116,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -136,12 +138,10 @@ const styles = StyleSheet.create({
   profileText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1C1C1E',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1C1C1E',
     flex: 1,
     textAlign: 'center',
   },
@@ -157,16 +157,13 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginBottom: 8,
   },
   statusText: {
     fontSize: 16,
-    color: '#8E8E93',
     lineHeight: 22,
   },
   riskCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 32,
@@ -209,7 +206,6 @@ const styles = StyleSheet.create({
   riskStatus: {
     fontSize: 48,
     fontWeight: '800',
-    color: '#06D6FF',
     marginBottom: 8,
   },
   riskBadge: {
@@ -222,7 +218,6 @@ const styles = StyleSheet.create({
   riskBadgeText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#06D6FF',
     letterSpacing: 0.5,
   },
   riskCardContent: {
@@ -231,20 +226,17 @@ const styles = StyleSheet.create({
   aiLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     letterSpacing: 1,
     marginBottom: 8,
   },
   riskTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginBottom: 12,
   },
   riskDescription: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#636366',
     marginBottom: 20,
   },
   viewButton: {
@@ -256,7 +248,6 @@ const styles = StyleSheet.create({
   viewButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -302,15 +293,12 @@ const styles = StyleSheet.create({
   signalLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   signalValue: {
     fontSize: 13,
-    color: '#8E8E93',
   },
   insightCard: {
-    backgroundColor: '#E8F8FF',
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
@@ -331,13 +319,11 @@ const styles = StyleSheet.create({
   insightText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1C1C1E',
     lineHeight: 22,
     marginBottom: 8,
   },
   insightSuggestion: {
     fontSize: 14,
-    color: '#636366',
     lineHeight: 20,
   },
   bottomSpacing: {

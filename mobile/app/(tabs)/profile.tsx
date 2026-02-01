@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Settings, Bell, Shield, HelpCircle, ChevronRight } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Colors } from '@/constants/theme';
 
 export default function ProfileScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
   const menuItems = [
     { id: '1', icon: Settings, label: 'Account Settings', hasChevron: true },
     { id: '2', icon: Bell, label: 'Notifications', hasChevron: true },
@@ -13,53 +16,53 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Profile</Text>
 
-        <View style={styles.profileCard}>
+        <View style={[styles.profileCard, { backgroundColor: colors.backgroundCard }]}>
           <View style={styles.profilePic}>
-            <Text style={styles.profileText}>A</Text>
+            <Text style={[styles.profileText, { color: colors.text }]}>A</Text>
           </View>
-          <Text style={styles.profileName}>Alex</Text>
-          <Text style={styles.profileEmail}>alex@example.com</Text>
+          <Text style={[styles.profileName, { color: colors.text }]}>Alex</Text>
+          <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>alex@example.com</Text>
         </View>
 
-        <View style={styles.statsCard}>
+        <View style={[styles.statsCard, { backgroundColor: colors.backgroundCard }]}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>87</Text>
-            <Text style={styles.statLabel}>Days Tracked</Text>
+            <Text style={[styles.statValue, { color: colors.accent }]}>87</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Days Tracked</Text>
           </View>
-          <View style={styles.statDivider} />
+          <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>12</Text>
-            <Text style={styles.statLabel}>Insights Found</Text>
+            <Text style={[styles.statValue, { color: colors.accent }]}>12</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Insights Found</Text>
           </View>
-          <View style={styles.statDivider} />
+          <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>95%</Text>
-            <Text style={styles.statLabel}>Data Quality</Text>
+            <Text style={[styles.statValue, { color: colors.accent }]}>95%</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Data Quality</Text>
           </View>
         </View>
 
-        <View style={styles.menuSection}>
+        <View style={[styles.menuSection, { backgroundColor: colors.backgroundCard }]}>
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
-              <TouchableOpacity key={item.id} style={styles.menuItem} activeOpacity={0.7}>
-                <View style={styles.menuIcon}>
-                  <Icon size={22} color="#06D6FF" />
+              <TouchableOpacity key={item.id} style={[styles.menuItem, { borderBottomColor: colors.border }]} activeOpacity={0.7}>
+                <View style={[styles.menuIcon, { backgroundColor: colorScheme === 'dark' ? '#1A3A44' : '#F0FBFF' }]}>
+                  <Icon size={22} color={colors.accent} />
                 </View>
-                <Text style={styles.menuLabel}>{item.label}</Text>
-                {item.hasChevron && <ChevronRight size={20} color="#C7C7CC" />}
+                <Text style={[styles.menuLabel, { color: colors.text }]}>{item.label}</Text>
+                {item.hasChevron && <ChevronRight size={20} color={colors.textSecondary} />}
               </TouchableOpacity>
             );
           })}
         </View>
 
         <View style={styles.disclaimerCard}>
-          <Text style={styles.disclaimerTitle}>Health Intelligence Notice</Text>
-          <Text style={styles.disclaimerText}>
+          <Text style={[styles.disclaimerTitle, { color: colors.text }]}>Health Intelligence Notice</Text>
+          <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
             This app provides lifestyle pattern analysis and is not a medical diagnostic tool. Always
             consult a physician for health concerns.
           </Text>
@@ -78,7 +81,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -86,12 +88,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginTop: 12,
     marginBottom: 24,
   },
   profileCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 32,
     alignItems: 'center',
@@ -114,20 +114,16 @@ const styles = StyleSheet.create({
   profileText: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1C1C1E',
   },
   profileName: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 15,
-    color: '#8E8E93',
   },
   statsCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
@@ -145,20 +141,16 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#06D6FF',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#8E8E93',
     textAlign: 'center',
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#E5E5EA',
   },
   menuSection: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 24,
@@ -173,13 +165,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F7',
   },
   menuIcon: {
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: '#F0FBFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -188,7 +178,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: '#1C1C1E',
   },
   disclaimerCard: {
     backgroundColor: '#FFF9E6',
@@ -199,13 +188,11 @@ const styles = StyleSheet.create({
   disclaimerTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1C1C1E',
     marginBottom: 8,
   },
   disclaimerText: {
     fontSize: 13,
     lineHeight: 19,
-    color: '#636366',
   },
   logoutButton: {
     backgroundColor: '#FF3B30',
