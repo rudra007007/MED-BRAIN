@@ -8,12 +8,17 @@ interface InsightsState {
   communityTrends: any[];
   isLoading: boolean;
   error: string | null;
+  lastFetch: Date | null;
+  selectedInsight: PatternInsight | null;
   
   // Actions
   fetchPatternInsights: (userId?: string) => Promise<void>;
   fetchSymptomHistory: (userId?: string) => Promise<void>;
   fetchCommunityTrends: (category?: string) => Promise<void>;
+  selectInsight: (insight: PatternInsight | null) => void;
   clearInsights: () => void;
+  resetError: () => void;
+  refreshAll: (userId?: string) => Promise<void>;
 }
 
 export const useInsightsStore = create<InsightsState>((set) => ({
@@ -23,15 +28,19 @@ export const useInsightsStore = create<InsightsState>((set) => ({
   communityTrends: [],
   isLoading: false,
   error: null,
+  lastFetch: null,
+  selectedInsight: null,
 
   // Actions
   fetchPatternInsights: async (userId = 'default-user') => {
     set({ isLoading: true, error: null });
     try {
       const data = await insightsService.getPatternInsights(userId);
+      const insights: PatternInsight[] = Array.isArray(data) ? data : (data as any).data || [];
       set({ 
-        patternInsights: data,
-        isLoading: false 
+        patternInsights: insights,
+        isLoading: false,
+        lastFetch: new Date()
       });
     } catch (error) {
       set({ 
@@ -45,9 +54,11 @@ export const useInsightsStore = create<InsightsState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const data = await insightsService.getSymptomHistory(userId);
+      const history: SymptomHistoryItem[] = Array.isArray(data) ? data : (data as any).data || [];
       set({ 
-        symptomHistory: data,
-        isLoading: false 
+        symptomHistory: history,
+        isLoading: false,
+        lastFetch: new Date()
       });
     } catch (error) {
       set({ 
@@ -61,9 +72,11 @@ export const useInsightsStore = create<InsightsState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const data = await insightsService.getCommunityTrends(category);
+      const trends: any[] = Array.isArray(data) ? data : (data as any).data || [];
       set({ 
-        communityTrends: data,
-        isLoading: false 
+        communityTrends: trends,
+        isLoading: false,
+        lastFetch: new Date()
       });
     } catch (error) {
       set({ 
@@ -73,12 +86,46 @@ export const useInsightsStore = create<InsightsState>((set) => ({
     }
   },
 
+  selectInsight: (insight: PatternInsight | null) => {
+    set({ selectedInsight: insight });
+  },
+
   clearInsights: () => {
     set({ 
       patternInsights: [],
       symptomHistory: [],
       communityTrends: [],
-      error: null 
+      selectedInsight: null,
+      error: null,
+      lastFetch: null
     });
   },
+
+  resetError: () => {
+    set({ error: null });
+  },
+
+  refreshAll: async (userId = 'default-user') => {
+    set({ isLoading: true, error: null });
+    try {
+      const [patternData, historyData, trendsData] = await Promise.all([
+        insightsService.getPatternInsights(userId),
+        insightsService.getSymptomHistory(userId),
+        insightsService.getCommunityTrends()
+      ]);
+      
+      set({ 
+        patternInsights: Array.isArray(patternData) ? patternData : (patternData as any).data || [],
+        symptomHistory: Array.isArray(historyData) ? historyData : (historyData as any).data || [],
+        communityTrends: Array.isArray(trendsData) ? trendsData : (trendsData as any).data || [],
+        isLoading: false,
+        lastFetch: new Date()
+      });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to refresh data',
+        isLoading: false 
+      });
+    }
+  }
 }));

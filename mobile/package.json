@@ -3,16 +3,9 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-<<<<<<< Updated upstream
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-=======
     "start": "expo start -p kyqapx6fm896uhbg7gute --tunnel",
     "start-web": "expo start -p kyqapx6fm896uhbg7gute --web --tunnel",
     "start-web-dev": "DEBUG=expo* expo start -p kyqapx6fm896uhbg7gute --web --tunnel",
->>>>>>> Stashed changes
     "lint": "expo lint"
   },
   "dependencies": {

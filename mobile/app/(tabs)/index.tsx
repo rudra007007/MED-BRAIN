@@ -1,29 +1,19 @@
-<<<<<<< Updated upstream
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
-=======
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
->>>>>>> Stashed changes
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { currentHealthSignals, riskDriftData, recentIntelligence } from '../../mocks/healthdata';
 import type { HealthSignal } from '../../types/health';
-<<<<<<< Updated upstream
 import { Colors } from '@/constants/theme';
-
-export default function HomeScreen() {
-  const router = useRouter();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-=======
 import { useAnalyticsStore } from '../../store/analytics.store';
 import { useHealthStore } from '../../store/health.store';
 import { useInsightsStore } from '../../store/insights.store';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
   const { backendStatus, checkBackend } = useAnalyticsStore();
   const { healthData, fetchHealthData } = useHealthStore();
   const { patternInsights, fetchPatternInsights } = useInsightsStore();
@@ -32,8 +22,7 @@ export default function HomeScreen() {
     checkBackend();
     fetchHealthData();
     fetchPatternInsights();
-  }, []);
->>>>>>> Stashed changes
+  }, [checkBackend, fetchHealthData, fetchPatternInsights]);
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -64,12 +53,8 @@ export default function HomeScreen() {
           </View>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Health Intelligence</Text>
           <View style={styles.logoContainer}>
-<<<<<<< Updated upstream
-            <Sparkles size={24} color={colors.accent} />
-=======
             <View style={[styles.statusDot, backendStatus && styles.statusDotActive]} />
-            <Sparkles size={24} color="#06D6FF" />
->>>>>>> Stashed changes
+            <Sparkles size={24} color={colors.accent} />
           </View>
         </View>
 
@@ -78,7 +63,7 @@ export default function HomeScreen() {
           <Text style={[styles.statusText, { color: colors.textSecondary }]}>{riskDriftData.message}</Text>
         </View>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.riskCard, { backgroundColor: colors.backgroundCard }]}
           activeOpacity={0.9}
           onPress={() => router.push('/pattern-insights')}
@@ -125,13 +110,10 @@ export default function HomeScreen() {
           <Text style={[styles.sectionTitle, { color: colors.text }]}>What changed recently</Text>
         </View>
 
-<<<<<<< Updated upstream
-        <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
-=======
-        {patternInsights.length > 0 && (
-          <View style={styles.insightCard}>
+        {patternInsights.length > 0 ? (
+          <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
             <View style={styles.insightIcon}>
-              <Lightbulb size={24} color="#06D6FF" />
+              <Lightbulb size={24} color={colors.accent} />
             </View>
             <View style={styles.insightContent}>
               <Text style={styles.insightLabel}>LATEST INSIGHT</Text>
@@ -139,10 +121,9 @@ export default function HomeScreen() {
               <Text style={styles.insightDescription}>{patternInsights[0].description}</Text>
             </View>
           </View>
-        )}
+        ) : null}
 
-        <View style={styles.insightCard}>
->>>>>>> Stashed changes
+        <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
           <View style={styles.insightIcon}>
             <Lightbulb size={24} color={colors.accent} />
           </View>
@@ -160,17 +141,17 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 12,
-    marginBottom: 24,
+    marginBottom: 24
   },
   profilePic: {
     width: 44,
@@ -178,24 +159,24 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: '#FFE4D6',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   profileText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
     flex: 1,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   logoContainer: {
     width: 44,
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
+    position: 'relative'
   },
   statusDot: {
     position: 'absolute',
@@ -206,22 +187,22 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#8E8E93',
     borderWidth: 2,
-    borderColor: '#F2F2F7',
+    borderColor: '#F2F2F7'
   },
   statusDotActive: {
-    backgroundColor: '#34C759',
+    backgroundColor: '#34C759'
   },
   greetingSection: {
-    marginBottom: 24,
+    marginBottom: 24
   },
   greeting: {
     fontSize: 32,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: 8
   },
   statusText: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 22
   },
   riskCard: {
     borderRadius: 20,
@@ -231,7 +212,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-    elevation: 3,
+    elevation: 3
   },
   riskCardHeader: {
     backgroundColor: '#D6F5FF',
@@ -239,14 +220,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 24,
     position: 'relative',
-    overflow: 'hidden',
+    overflow: 'hidden'
   },
   waveBackground: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 0
   },
   wave: {
     position: 'absolute',
@@ -257,78 +238,78 @@ const styles = StyleSheet.create({
     opacity: 0.4,
     borderRadius: 100,
     transform: [{ scaleX: 3 }],
-    top: 20,
+    top: 20
   },
   wave2: {
     top: 40,
-    opacity: 0.3,
+    opacity: 0.3
   },
   riskStatus: {
     fontSize: 48,
     fontWeight: '800',
-    marginBottom: 8,
+    marginBottom: 8
   },
   riskBadge: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(6, 214, 255, 0.2)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 6,
+    borderRadius: 6
   },
   riskBadgeText: {
     fontSize: 12,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 0.5
   },
   riskCardContent: {
-    padding: 24,
+    padding: 24
   },
   aiLabel: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
-    marginBottom: 8,
+    marginBottom: 8
   },
   riskTitle: {
     fontSize: 22,
     fontWeight: '700',
-    marginBottom: 12,
+    marginBottom: 12
   },
   riskDescription: {
     fontSize: 15,
     lineHeight: 22,
-    marginBottom: 20,
+    marginBottom: 20
   },
   viewButton: {
     backgroundColor: '#06D6FF',
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   viewButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 16
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
+    color: '#1C1C1E'
   },
   historyLink: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#06D6FF',
+    color: '#06D6FF'
   },
   signalsGrid: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 32
   },
   signalCard: {
     flex: 1,
@@ -339,7 +320,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 2
   },
   signalIcon: {
     width: 48,
@@ -348,22 +329,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 12
   },
   signalLabel: {
     fontSize: 15,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 4
   },
   signalValue: {
-    fontSize: 13,
+    fontSize: 13
   },
   insightCard: {
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 32,
+    marginBottom: 32
   },
   insightIcon: {
     width: 48,
@@ -371,40 +352,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#D6F5FF',
     borderRadius: 24,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   insightContent: {
-    flex: 1,
+    flex: 1
   },
   insightLabel: {
     fontSize: 12,
     fontWeight: '700',
     color: '#8E8E93',
     textTransform: 'uppercase',
-    marginBottom: 4,
+    marginBottom: 4
   },
   insightTitle: {
     fontSize: 17,
     fontWeight: '700',
     color: '#1C1C1E',
-    marginBottom: 4,
+    marginBottom: 4
   },
   insightDescription: {
     fontSize: 14,
     color: '#636366',
-    lineHeight: 20,
+    lineHeight: 20
   },
   insightText: {
     fontSize: 15,
     fontWeight: '600',
     lineHeight: 22,
-    marginBottom: 8,
+    marginBottom: 8
   },
   insightSuggestion: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 20
   },
   bottomSpacing: {
-    height: 20,
-  },
+    height: 20
+  }
 });
