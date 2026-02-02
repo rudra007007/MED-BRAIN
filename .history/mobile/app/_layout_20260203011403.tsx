@@ -23,7 +23,8 @@ function RootLayoutNav() {
       <Stack.Screen name="activity-detail" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
       <Stack.Screen name="recovery-signal" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
       <Stack.Screen name="profile" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
-      <Stack.Screen name="menu" options={{headerShown: false, headerLeft: undefined, }}/>
+      <Stack.Screen name="menu" options={{
+    headerShown: true, headerBackTitleVisible: false, headerLeft: undefined, }}/>
     </Stack>
   );
 }

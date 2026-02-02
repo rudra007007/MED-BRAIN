@@ -190,13 +190,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16
+    marginBottom: 26,
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
-    marginBottom: 1
+    color: '#1C1C1E'
   },
   historyLink: {
     fontSize: 15,

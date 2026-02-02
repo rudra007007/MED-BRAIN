@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16
+    marginBottom: 1
   },
   sectionTitle: {
     fontSize: 22,

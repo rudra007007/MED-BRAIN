@@ -109,6 +109,18 @@ export default function ProfileScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      <View style={styles.navBar}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
+          <Text style={styles.navLabel}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/insight')}>
+          <Text style={styles.navLabel}>Insights</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/community')}>
+          <Text style={styles.navLabel}>Community</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

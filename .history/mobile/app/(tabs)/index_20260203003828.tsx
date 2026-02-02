@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 32
   },
   signalCard: {
+    
     flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 16,

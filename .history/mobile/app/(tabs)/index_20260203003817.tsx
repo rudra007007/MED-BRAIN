@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   signalIcon: {
-    width: 48,
+    width: ,
     height: 48,
     backgroundColor: '#F0FBFF',
     borderRadius: 12,
