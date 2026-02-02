@@ -195,8 +195,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
-    marginBottom: 1
+    color: '#1C1C1E'
   },
   historyLink: {
     fontSize: 15,

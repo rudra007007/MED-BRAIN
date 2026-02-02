@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#1C1C1E',
-    marginBottom: 1
+    mar
   },
   historyLink: {
     fontSize: 15,

@@ -20,8 +20,8 @@ export default function AppHeader({ userName = 'Alex', onMenuPress }: AppHeaderP
     if (onMenuPress) {
       onMenuPress();
     }
-    // Navigate to the Menu page
-    router.push('/menu');
+    // Navigate to the Menubar page
+    router.push('/../components/common/menubar');
   };
 
   return (

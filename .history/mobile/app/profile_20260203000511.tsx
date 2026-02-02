@@ -109,6 +109,8 @@ export default function ProfileScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      
     </SafeAreaView>
   );
 }
