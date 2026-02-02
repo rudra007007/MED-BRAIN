@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
 
   // Community endpoints
   COMMUNITY_TRENDS: `${API_BASE_URL}/community/trends`,
+  COMMUNITY_POSTS: `${API_BASE_URL}/community/posts`,
 
   // Status
   STATUS: `${API_BASE_URL}/status`,

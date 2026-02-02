@@ -1,153 +1,370 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, useColorScheme } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  useColorScheme,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  StatusBar,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TrendingUp, TrendingDown, Activity, Shield } from 'lucide-react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { communityTrends } from '../../mocks/healthdata';
-import type { CommunityTrend } from '../../types/health';
+import { X, Send, Plus, ShieldCheck } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
+import { useCommunityStore, type ReactionType, type CommunityPost } from '@/store/community.store';
+import Post from '@/components/community/Post';
+import Comment from '@/components/community/Comment';
+import { mockCommunityPosts, mockCommunityComments } from '@/mocks/communitydata';
 
 export default function CommunityScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const isDark = colorScheme === 'dark';
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'rising':
-        return <TrendingUp size={16} color={colors.accent} />;
-      case 'improving':
-        return <TrendingDown size={16} color={colors.accent} />;
-      case 'emerging':
-        return <Activity size={16} color={colors.accent} />;
-      default:
-        return null;
+  const {
+    posts,
+    comments,
+    selectedPostId,
+    setPosts,
+    setComments,
+    reactToPost,
+    unreactToPost,
+    reactToComment,
+    setSelectedPost,
+    addComment,
+  } = useCommunityStore();
+
+  const [commentModalVisible, setCommentModalVisible] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [newPostModalVisible, setNewPostModalVisible] = useState(false);
+  const [newPostContent, setNewPostContent] = useState('');
+  const [selectedTag, setSelectedTag] = useState<'Stabilizing' | 'Recovering' | 'Drift detected'>('Stabilizing');
+
+  // Load mock data on mount
+  useEffect(() => {
+    setPosts(mockCommunityPosts);
+    // Load comments for each post
+    Object.keys(mockCommunityComments).forEach((postId) => {
+      setComments(postId, mockCommunityComments[postId]);
+    });
+  }, []);
+
+  const handleReact = (postId: string, reactionType: ReactionType) => {
+    const post = posts.find((p) => p.id === postId);
+    if (post?.userReaction === reactionType) {
+      unreactToPost(postId, reactionType);
+    } else {
+      reactToPost(postId, reactionType);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'rising':
-        return colors.accent;
-      case 'improving':
-        return colors.accent;
-      case 'emerging':
-        return colors.accent;
-      default:
-        return colors.accent;
-    }
+  const handleCommentPress = (postId: string) => {
+    setSelectedPost(postId);
+    setCommentModalVisible(true);
   };
 
-  const getStatusBg = (status: string) => {
-    switch (status) {
-      case 'rising':
-        return 'rgba(255, 107, 107, 0.15)';
-      case 'improving':
-        return 'rgba(0, 217, 159, 0.15)';
-      case 'emerging':
-        return 'rgba(255, 193, 7, 0.15)';
-      default:
-        return 'rgba(255, 255, 255, 0.1)';
-    }
+  const handleCloseCommentModal = () => {
+    setCommentModalVisible(false);
+    setCommentText('');
+    setTimeout(() => setSelectedPost(null), 300);
   };
 
-  const getChartImage = (chart?: string) => {
-    if (chart === 'allergy') {
-      return 'https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&h=200&fit=crop';
-    }
-    if (chart === 'sleep') {
-      return 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&h=200&fit=crop';
-    }
-    return null;
+  const handleSendComment = () => {
+    if (!commentText.trim() || !selectedPostId) return;
+
+    const newComment = {
+      id: `c${Date.now()}`,
+      postId: selectedPostId,
+      userId: 'current-user',
+      username: 'User_' + Math.floor(Math.random() * 900 + 100),
+      content: commentText.trim(),
+      reactions: { support: 0 },
+      userReaction: false,
+      timestamp: new Date(),
+    };
+
+    addComment(newComment);
+    setCommentText('');
   };
+
+  const handleCommentReact = (commentId: string, postId: string) => {
+    reactToComment(commentId, postId);
+  };
+
+  const handleCreatePost = () => {
+    if (!newPostContent.trim()) return;
+
+    const newPost: CommunityPost = {
+      id: `p${Date.now()}`,
+      userId: 'current-user',
+      username: 'User_' + Math.floor(Math.random() * 900 + 100),
+      content: newPostContent.trim(),
+      tags: [selectedTag],
+      reactions: { support: 0, strength: 0, solidarity: 0 },
+      commentCount: 0,
+      timestamp: new Date(),
+      userReaction: null,
+    };
+
+    setPosts([newPost, ...posts]);
+    setNewPostContent('');
+    setNewPostModalVisible(false);
+  };
+
+  const selectedPost = posts.find((p) => p.id === selectedPostId);
+  const postComments = selectedPostId ? comments[selectedPostId] || [] : [];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-
-        <View style={[styles.infoCard, { backgroundColor: colors.backgroundAccent }]}>
-          <Shield size={20} color={colors.accent} />
-          <View style={styles.infoContent}>
-            <Text style={[styles.infoTitle, { color: colors.text }]}>Anonymized Regional Data</Text>
-            <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-              Aggregated signals for community awareness. This is not a diagnostic tool.
-            </Text>
-          </View>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Community</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.textTertiary }]}>
+            Share insights, support each other
+          </Text>
         </View>
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: colors.accent }]}
+          onPress={() => setNewPostModalVisible(true)}
+          activeOpacity={0.8}
+        >
+          <Plus size={20} color="#000" />
+          <Text style={styles.addButtonText}>Share</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.filtersRow}>
-          <View style={styles.filterChip}>
-            <Text style={[styles.filterChipText, { color: colors.text }]}>Greater London</Text>
-          </View>
-          <View style={styles.filterChip}>
-            <Text style={[styles.filterChipText, { color: colors.text }]}>Past 24h</Text>
-          </View>
-          <View style={styles.filterChip}>
-            <Text style={[styles.filterChipText, { color: colors.text }]}>All Signals</Text>
-          </View>
+      {/* Community Info Card */}
+      <View style={[styles.infoCard, { backgroundColor: colors.backgroundAccent }]}>
+        <ShieldCheck size={20} color={colors.accent} />
+        <View style={styles.infoContent}>
+          <Text style={[styles.infoTitle, { color: colors.text }]}>Anonymous & Supportive</Text>
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+            Connect with others. All usernames are anonymized. This is a space for shared learning, not medical advice.
+          </Text>
         </View>
+      </View>
 
-        <View style={styles.mapPlaceholder}>
-          <Text style={[styles.mapText, { color: colors.accent }]}>London</Text>
-          <View style={styles.mapOverlay}>
-            <View style={[styles.mapLegendItem, { backgroundColor: '#06D6FF' }]}>
-              <Text style={[styles.mapLegendText, { color: colors.text }]}>Rising Signal</Text>
-            </View>
-            <View style={[styles.mapLegendItem, { backgroundColor: '#E5E5EA' }]}>
-              <Text style={[styles.mapLegendText, { color: colors.text }]}>Stable</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Early Signal Warnings</Text>
-          <Text style={[styles.alertCount, { color: colors.textSecondary }]}>3 Active Alerts</Text>
-        </View>
-
-        {communityTrends.map((trend: CommunityTrend) => {
-          const chartImage = getChartImage(trend.chart);
-          const statusColor = getStatusColor(trend.status);
-          const statusBg = getStatusBg(trend.status);
-
-          return (
-            <TouchableOpacity key={trend.id} style={[styles.trendCard, { backgroundColor: colors.backgroundCard }]} activeOpacity={0.85}>
-              {chartImage && (
-                <View style={styles.chartContainer}>
-                  <Image source={{ uri: chartImage }} style={styles.trendChart} />
-                  <View style={styles.chartOverlay} />
-                </View>
-              )}
-              <View style={styles.trendContent}>
-                <View style={[styles.trendBadge, { backgroundColor: statusBg }]}>
-                  {getStatusIcon(trend.status)}
-                  <Text style={[styles.trendBadgeText, { color: statusColor }]}>
-                    {trend.status.toUpperCase()}
-                  </Text>
-                </View>
-                <Text style={[styles.trendTitle, { color: colors.text }]} numberOfLines={2}>{trend.title}</Text>
-                <Text style={[styles.trendDescription, { color: colors.textSecondary }]} numberOfLines={3}>{trend.description}</Text>
-                <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
-                  <Text style={styles.actionButtonText}>
-                    {trend.status === 'rising' ? 'View Analysis' : trend.status === 'improving' ? 'Learn More' : 'Compare'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>SIGNALS ANALYZED</Text>
-            <Text style={[styles.statValue, { color: colors.text }]}>12.4M +</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>DATA INTEGRITY</Text>
-            <Text style={[styles.statValue, { color: colors.text }]}>Anonymized</Text>
-          </View>
-        </View>
+      {/* Posts Feed */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {posts.map((post) => (
+          <Post
+            key={post.id}
+            post={post}
+            onReact={(reactionType: ReactionType) => handleReact(post.id, reactionType)}
+            onComment={() => handleCommentPress(post.id)}
+          />
+        ))}
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      {/* Comment Modal */}
+      <Modal
+        visible={commentModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={handleCloseCommentModal}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
+          <View style={[styles.modalContent, { backgroundColor: colors.backgroundCard }]}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Comments</Text>
+              <TouchableOpacity onPress={handleCloseCommentModal} style={styles.closeButton}>
+                <X size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Original Post Summary */}
+            {selectedPost && (
+              <View style={[styles.postSummary, { backgroundColor: colors.background }]}>
+                <Text style={[styles.postSummaryUsername, { color: colors.accent }]}>
+                  {selectedPost.username}
+                </Text>
+                <Text style={[styles.postSummaryContent, { color: colors.text }]} numberOfLines={2}>
+                  {selectedPost.content}
+                </Text>
+              </View>
+            )}
+
+            {/* Comments List */}
+            <ScrollView style={styles.commentsList} showsVerticalScrollIndicator={false}>
+              {postComments.length === 0 ? (
+                <Text style={[styles.noComments, { color: colors.textTertiary }]}>
+                  Be the first to share encouragement
+                </Text>
+              ) : (
+                postComments.map((comment) => (
+                  <Comment
+                    key={comment.id}
+                    comment={comment}
+                    onReact={() => handleCommentReact(comment.id, comment.postId)}
+                  />
+                ))
+              )}
+            </ScrollView>
+
+            {/* Comment Input */}
+            <View style={[styles.commentInputContainer, { backgroundColor: colors.background }]}>
+              <TextInput
+                style={[styles.commentInput, { color: colors.text }]}
+                placeholder="Share something kind..."
+                placeholderTextColor={colors.textTertiary}
+                value={commentText}
+                onChangeText={setCommentText}
+                multiline
+                maxLength={300}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.sendButton,
+                  { backgroundColor: commentText.trim() ? colors.accent : colors.backgroundAccent },
+                ]}
+                onPress={handleSendComment}
+                disabled={!commentText.trim()}
+                activeOpacity={0.8}
+              >
+                <Send size={20} color={commentText.trim() ? '#000' : colors.textTertiary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* New Post Modal */}
+      <Modal
+        visible={newPostModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setNewPostModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
+          <View style={[styles.modalContent, { backgroundColor: colors.backgroundCard }]}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Share with Community</Text>
+              <TouchableOpacity
+                onPress={() => setNewPostModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <X size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Tag Selection */}
+            <Text style={[styles.inputLabel, { color: colors.text }]}>What's on your mind?</Text>
+            <View style={styles.tagSelector}>
+              {(['Stabilizing', 'Recovering', 'Drift detected'] as const).map((tag) => (
+                <TouchableOpacity
+                  key={tag}
+                  style={[
+                    styles.tagButton,
+                    {
+                      backgroundColor:
+                        selectedTag === tag
+                          ? tag === 'Stabilizing'
+                            ? 'rgba(0, 217, 159, 0.2)'
+                            : tag === 'Recovering'
+                            ? 'rgba(6, 214, 255, 0.2)'
+                            : 'rgba(255, 184, 77, 0.2)'
+                          : colors.background,
+                      borderColor:
+                        selectedTag === tag
+                          ? tag === 'Stabilizing'
+                            ? '#00D99F'
+                            : tag === 'Recovering'
+                            ? '#06D6FF'
+                            : '#FFB84D'
+                          : colors.border,
+                    },
+                  ]}
+                  onPress={() => setSelectedTag(tag)}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.tagButtonText,
+                      {
+                        color:
+                          selectedTag === tag
+                            ? tag === 'Stabilizing'
+                              ? '#00D99F'
+                              : tag === 'Recovering'
+                              ? '#06D6FF'
+                              : '#FFB84D'
+                            : colors.textTertiary,
+                      },
+                    ]}
+                  >
+                    {tag}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Post Content Input */}
+            <TextInput
+              style={[styles.postInput, { color: colors.text }]}
+              placeholder="Share a small win, insight, or what you've been noticing..."
+              placeholderTextColor={colors.textTertiary}
+              value={newPostContent}
+              onChangeText={setNewPostContent}
+              multiline
+              textAlignVertical="top"
+              maxLength={500}
+            />
+            <Text style={[styles.charCount, { color: colors.textTertiary }]}>
+              {newPostContent.length}/500
+            </Text>
+
+            {/* Post Guidelines */}
+            <View style={styles.guidelines}>
+              <Text style={[styles.guidelinesTitle, { color: colors.text }]}>Community Guidelines</Text>
+              <Text style={[styles.guidelinesText, { color: colors.textTertiary }]}>
+                • Share experiences, not medical advice{'\n'}
+                • Be kind and supportive{'\n'}
+                • Respect everyone's journey
+              </Text>
+            </View>
+
+            {/* Post Button */}
+            <TouchableOpacity
+              style={[
+                styles.postButton,
+                { backgroundColor: newPostContent.trim() ? colors.accent : colors.backgroundAccent },
+              ]}
+              onPress={handleCreatePost}
+              disabled={!newPostContent.trim()}
+              activeOpacity={0.8}
+            >
+              <Text
+                style={[
+                  styles.postButtonText,
+                  { color: newPostContent.trim() ? '#000' : colors.textTertiary },
+                ]}
+              >
+                Share
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -156,33 +373,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 12,
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
+    marginBottom: 4,
   },
-  filterButton: {
+  headerSubtitle: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 6,
   },
-  filterText: {
-    fontSize: 15,
+  addButtonText: {
+    fontSize: 14,
     fontWeight: '600',
+    color: '#000',
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
   },
   infoCard: {
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     gap: 12,
@@ -199,170 +424,140 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 13,
     lineHeight: 18,
-  },
-  filtersRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 20,
-  },
-  filterChip: {
-    backgroundColor: '#1A2942',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  mapPlaceholder: {
-    height: 200,
-    backgroundColor: '#D6F5FF',
-    borderRadius: 16,
-    marginBottom: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  mapText: {
-    fontSize: 32,
-    fontWeight: '700',
-    opacity: 0.3,
-  },
-  mapOverlay: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    gap: 8,
-  },
-  mapLegendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  mapLegendText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-  },
-  alertCount: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  trendCard: {
-    width: '100%',
-    borderRadius: 24,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  chartContainer: {
-    position: 'relative',
-  },
-  chartOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-  },
-  trendContent: {
-    padding: 24,
-  },
-  trendBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  trendBadgeText: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-  },
-  trendTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    marginBottom: 10,
-    lineHeight: 24,
-    letterSpacing: -0.3,
-  },
-  trendDescription: {
-    fontSize: 14,
-    lineHeight: 21,
-    marginBottom: 20,
     opacity: 0.8,
-  },
-  actionButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-    shadowColor: '#06D6FF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  actionButtonText: {
-    color: '#000',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-  trendChart: {
-    width: '100%',
-    height: 150,
-    backgroundColor: '#0A1929',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 24,
-    marginBottom: 32,
-    paddingHorizontal: 20,
-  },
-  statCard: {
-    flex: 1,
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  statLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-    marginBottom: 8,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '700',
   },
   bottomSpacing: {
     height: 20,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: 34,
+    maxHeight: '85%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  postSummary: {
+    margin: 16,
+    padding: 12,
+    borderRadius: 12,
+  },
+  postSummaryUsername: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  postSummaryContent: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  commentsList: {
+    paddingHorizontal: 16,
+    maxHeight: 350,
+  },
+  noComments: {
+    textAlign: 'center',
+    paddingVertical: 40,
+    fontSize: 14,
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    paddingHorizontal: 16,
+    borderRadius: 24,
+  },
+  commentInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 15,
+    maxHeight: 100,
+  },
+  sendButton: {
+    padding: 10,
+    borderRadius: 20,
+  },
+  // New Post Modal
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginHorizontal: 20,
+    marginBottom: 12,
+  },
+  tagSelector: {
+    flexDirection: 'row',
+    gap: 10,
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  tagButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  tagButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  postInput: {
+    height: 140,
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 16,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  charCount: {
+    textAlign: 'right',
+    fontSize: 12,
+    marginTop: 8,
+    marginRight: 20,
+  },
+  guidelines: {
+    margin: 20,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(6, 214, 255, 0.08)',
+  },
+  guidelinesTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  guidelinesText: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  postButton: {
+    marginHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  postButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
