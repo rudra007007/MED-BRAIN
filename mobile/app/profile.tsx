@@ -13,6 +13,10 @@ import { ArrowLeft, LogOut } from 'lucide-react-native';
 export default function ProfileScreen() {
   const router = useRouter();
 
+  const handleSignOut = () => {
+    router.replace('/auth');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -98,7 +102,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
           <LogOut size={18} color="#FF3B30" />
           <Text style={styles.logoutButtonText}>Sign Out</Text>
         </TouchableOpacity>
@@ -107,17 +111,14 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navLabel}>HOME</Text>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
+          <Text style={styles.navLabel}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navLabel}>INSIGHTS</Text>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/insight')}>
+          <Text style={styles.navLabel}>Insights</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navLabel}>TRENDS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>PROFILE</Text>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/community')}>
+          <Text style={styles.navLabel}>Community</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

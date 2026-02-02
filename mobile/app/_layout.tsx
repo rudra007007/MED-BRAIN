@@ -13,6 +13,9 @@ const queryClient = new QueryClient();
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Back" }}>
+      <Stack.Screen name="auth" options={{ headerShown: false }} />
+      <Stack.Screen name="signup" options={{ headerShown: false }} />
+      <Stack.Screen name="personalize" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="symptom-input" options={{ headerShown: false }} />
       <Stack.Screen name="pattern-insights" options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
