@@ -3,32 +3,15 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, Share2 } from 'lucide-react-native';
-import ChartScrubber from '../components/ui/ChartScrubber';
+import ChartScrubber from '../../components/ui/ChartScrubber';
 
 export default function SleepIntelligenceScreen() {
-  const router = useRouter();
   const sleepTrendData = [60, 72, 68, 80, 75, 70, 82];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sleep Intelligence</Text>
-        <TouchableOpacity style={styles.shareButton}>
-          <Share2 size={24} color="#2DD4BF" />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.scoreSection}>
           <View style={styles.scoreGlow} />
@@ -72,26 +55,14 @@ export default function SleepIntelligenceScreen() {
           <Text style={styles.insightTitle}>AI INSIGHT</Text>
           <Text style={styles.insightText}>Deep sleep was 15% lower than your 30-day average.</Text>
           <Text style={styles.insightDescription}>
-            Your body's physical recovery may be slightly hindered. Try to avoid blue light exposure at
-            least 60 minutes before your target sleep time tomorrow.
+            {"Your body's physical recovery may be slightly hindered. Try to avoid blue light exposure at least 60 minutes before your target sleep time tomorrow."}
           </Text>
         </View>
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
-          <Text style={styles.navLabel}>HOME</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>INSIGHTS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/insight')}>
-          <Text style={styles.navLabel}>TRENDS</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

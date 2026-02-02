@@ -19,7 +19,7 @@ export default function HealthSetupScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      router.push('/trust-privacy');
+      router.push('/onboarding/trust-privacy');
       // router.push('/(tabs)');
     }, 1500);
   };

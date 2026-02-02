@@ -14,7 +14,7 @@ export default function ProfileScreen() {
   const router = useRouter();
 
   const handleSignOut = () => {
-    router.replace('/auth');
+    router.replace('/onboarding/auth');
   };
 
   return (
@@ -83,22 +83,6 @@ export default function ProfileScreen() {
               <Text style={styles.settingLabel}>Privacy Level</Text>
               <Text style={styles.settingValue}>Standard</Text>
             </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>App Version</Text>
-            <Text style={styles.settingValue}>1.0.0</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Terms of Service</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Privacy Policy</Text>
           </TouchableOpacity>
         </View>
 

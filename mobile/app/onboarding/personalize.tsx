@@ -49,7 +49,7 @@ export default function PersonalizeScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      router.push('/health-setup');
+      router.push('/onboarding/health-setup');
     }, 1500);
   };
 

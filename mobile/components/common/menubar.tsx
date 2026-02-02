@@ -33,11 +33,15 @@ import {
 type MainMenuItem = 'home' | 'bot' | 'data' | 'profile' | 'settings';
 type SettingsCategory = 'notifications' | 'privacy' | 'preferences' | 'about' | 'account' | null;
 
+type MenubarProps = {
+  onClose?: () => void;
+};
+
 // =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
-export default function Menubar() {
+export default function Menubar({ onClose }: MenubarProps) {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'dark'];
@@ -56,13 +60,18 @@ export default function Menubar() {
   const [privacyLevel, setPrivacyLevel] = useState<'low' | 'medium' | 'high'>('medium');
   const [dataSharing, setDataSharing] = useState(false);
   const [researchParticipation, setResearchParticipation] = useState(false);
-  const [language, setLanguage] = useState('English');
+  const [language] = useState('English');
   const [units, setUnits] = useState<'metric' | 'imperial'>('metric');
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
   // =============================================================================
   // HELPER FUNCTIONS
   // =============================================================================
+
+  const handleNavigate = (path: string) => {
+    router.push(path);
+    onClose?.();
+  };
 
   // Reset settings when leaving settings
   const handleMenuSelect = (menu: MainMenuItem) => {
@@ -73,10 +82,10 @@ export default function Menubar() {
       setActiveMenu(menu);
       setActiveSettingsCategory(null);
       // Navigate to appropriate page for non-settings menus
-      if (menu === 'home') router.push('/');
-      if (menu === 'profile') router.push('/profile');
-      if (menu === 'bot') router.push('/symptom-input');
-      if (menu === 'data') router.push('/health-setup');
+      if (menu === 'home') handleNavigate('/');
+      if (menu === 'profile') handleNavigate('/profile');
+      if (menu === 'bot') handleNavigate('/symptom-input');
+      if (menu === 'data') handleNavigate('/health-setup');
     }
   };
 
@@ -120,7 +129,7 @@ export default function Menubar() {
       {/* Back Button */}
       <TouchableOpacity 
         style={styles.simpleBackButton} 
-        onPress={() => router.back()}
+        onPress={() => (onClose ? onClose() : router.back())}
       >
         <ChevronLeft size={24} color={colors.text} />
         <Text style={[styles.simpleBackButtonText, { color: colors.text }]}>Back</Text>
@@ -430,7 +439,7 @@ export default function Menubar() {
         </Text>
         <TouchableOpacity 
           style={[styles.startButton, { backgroundColor: colors.accent }]}
-          onPress={() => router.push('/symptom-input')}
+          onPress={() => handleNavigate('/symptom-input')}
         >
           <Text style={styles.startButtonText}>Start Conversation</Text>
         </TouchableOpacity>
@@ -449,7 +458,7 @@ export default function Menubar() {
         </Text>
         <TouchableOpacity 
           style={[styles.startButton, { backgroundColor: colors.accent }]}
-          onPress={() => router.push('/health-setup')}
+          onPress={() => handleNavigate('/health-setup')}
         >
           <Text style={styles.startButtonText}>View Health Data</Text>
         </TouchableOpacity>
@@ -468,7 +477,7 @@ export default function Menubar() {
         <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>alex@example.com</Text>
         <TouchableOpacity 
           style={[styles.startButton, { backgroundColor: colors.accent }]}
-          onPress={() => router.push('/profile')}
+          onPress={() => handleNavigate('/profile')}
         >
           <Text style={styles.startButtonText}>Edit Profile</Text>
         </TouchableOpacity>

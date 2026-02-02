@@ -19,8 +19,8 @@ export default function AppHeader({ userName = 'Alex', onMenuPress }: AppHeaderP
   const handleMenuPress = () => {
     if (onMenuPress) {
       onMenuPress();
+      return;
     }
-    // Navigate to the Menu page
     router.push('/menu');
   };
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles, Smartphone } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Smartphone, TrendingUp, ArrowRight } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { currentHealthSignals, riskDriftData, recentIntelligence, lifestyleTrajectoryRing } from '../../mocks/healthdata';
 import type { HealthSignal } from '../../types/health';
@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-  const { backendStatus, checkBackend } = useAnalyticsStore();
+  const { checkBackend } = useAnalyticsStore();
   const { fetchHealthData } = useHealthStore();
   const { patternInsights, fetchPatternInsights } = useInsightsStore();
 
@@ -48,12 +48,15 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.greetingSection}>
           <Text style={[styles.greeting, { color: colors.text }]}>{getTimeGreeting()}, Alex</Text>
-          <Text style={[styles.statusText, { color: colors.textSecondary }]}>{riskDriftData.message}</Text>
+          <View style={[styles.statusBadge, { backgroundColor: colors.backgroundCard }]}>
+            <View style={[styles.statusDot, { backgroundColor: colors.statusSuccess }]} />
+            <Text style={[styles.statusText, { color: colors.text }]}>{riskDriftData.message}</Text>
+          </View>
         </View>
 
         <LifestyleTrajectoryRing
@@ -65,13 +68,13 @@ export default function HomeScreen() {
 
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Current Health Signals</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/insight')}>
+          <TouchableOpacity onPress={() => router.push('/pattern-insights')}>
             <Text style={[styles.historyLink, { color: colors.accent }]}>History</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.signalsGrid}>
-          {currentHealthSignals.map((signal: HealthSignal) => (
+          {currentHealthSignals.map((signal: HealthSignal, index: number) => (
             <TouchableOpacity
               key={signal.id}
               onPress={() => {
@@ -79,45 +82,79 @@ export default function HomeScreen() {
                 else if (signal.type === 'activity') router.push('/activity-detail');
                 else if (signal.type === 'recovery') router.push('/recovery-signal');
               }}
-              style={[styles.signalCard, { backgroundColor: colors.backgroundCard }]}
-              activeOpacity={0.8}
+              style={styles.signalCardWrapper}
+              activeOpacity={0.75}
             >
-              <View style={styles.signalIcon}>{getSignalIcon(signal.type)}</View>
-              <Text style={[styles.signalLabel, { color: colors.textSecondary }]}>{signal.label}</Text>
-              <Text style={[styles.signalValue, { color: colors.text }]}>{signal.value}</Text>
+              <LinearGradient
+                colors={[
+                  colorScheme === 'dark' ? 'rgba(20, 241, 217, 0.08)' : 'rgba(20, 241, 217, 0.05)',
+                  colorScheme === 'dark' ? 'rgba(74, 144, 226, 0.06)' : 'rgba(74, 144, 226, 0.03)'
+                ]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.signalCard, { backgroundColor: colors.backgroundCard }]}
+              >
+                <View style={[styles.signalIconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(20, 241, 217, 0.15)' : 'rgba(20, 241, 217, 0.1)' }]}>
+                  {getSignalIcon(signal.type)}
+                </View>
+                <Text style={[styles.signalLabel, { color: colors.textSecondary }]}>{signal.label}</Text>
+                <Text style={[styles.signalValue, { color: colors.text }]}>{signal.value}</Text>
+                <View style={styles.signalArrow}>
+                  <ArrowRight size={14} color={colors.accent} />
+                </View>
+              </LinearGradient>
             </TouchableOpacity>
           ))}
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>What changed recently</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Insights</Text>
+          <TouchableOpacity>
+            <Text style={[styles.viewAllLink, { color: colors.accent }]}>View All</Text>
+          </TouchableOpacity>
         </View>
         {patternInsights.length > 0 && (
-          <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
-            <View style={styles.insightIcon}>
-              <Lightbulb size={24} color={colors.accent} />
+          <TouchableOpacity 
+            style={[styles.insightCardWrapper, { backgroundColor: colors.backgroundCard }]}
+            activeOpacity={0.85}
+            onPress={() => router.push('/pattern-insights')}
+          >
+            <View style={[styles.insightIconGradient, { backgroundColor: colorScheme === 'dark' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255, 193, 7, 0.1)' }]}>
+              <Lightbulb size={22} color="#FFC107" fill="#FFC107" />
             </View>
             <View style={styles.insightContent}>
-              <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>LATEST INSIGHT</Text>
+              <View style={styles.insightHeader}>
+                <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>LATEST PATTERN</Text>
+                {patternInsights[0].riskChange && (
+                  <View style={[styles.riskBadge, { backgroundColor: 'rgba(255, 59, 48, 0.1)' }]}>
+                    <TrendingUp size={12} color="#FF3B30" />
+                    <Text style={styles.riskText}>+{patternInsights[0].riskChange}%</Text>
+                  </View>
+                )}
+              </View>
               <Text style={[styles.insightTitle, { color: colors.text }]}>{patternInsights[0].title}</Text>
-              <Text style={[styles.insightDescription, { color: colors.textSecondary }]}>{patternInsights[0].description}</Text>
+              <Text style={[styles.insightDescription, { color: colors.textSecondary }]} numberOfLines={2}>
+                {patternInsights[0].description}
+              </Text>
             </View>
-          </View>
+            <ArrowRight size={18} color={colors.textSecondary} style={styles.insightArrow} />
+          </TouchableOpacity>
         )}
 
-        <View style={[styles.insightCard, { backgroundColor: colors.backgroundCard }]}>
-          <View style={styles.insightIcon}>
-            <Lightbulb size={24} color={colors.accent} />
+        <View style={[styles.quickTipCard, { backgroundColor: colors.backgroundCard }]}>
+          <View style={styles.quickTipHeader}>
+            <View style={[styles.quickTipIcon, { backgroundColor: colorScheme === 'dark' ? 'rgba(52, 199, 89, 0.15)' : 'rgba(52, 199, 89, 0.1)' }]}>
+              <Heart size={18} color="#34C759" />
+            </View>
+            <Text style={[styles.quickTipLabel, { color: colors.textSecondary }]}>PERSONALIZED TIP</Text>
           </View>
-          <View style={styles.insightContent}>
-            <Text style={[styles.insightText, { color: colors.text }]}>{recentIntelligence.message}</Text>
-            <Text style={[styles.insightSuggestion, { color: colors.textSecondary }]}>{recentIntelligence.suggestion}</Text>
-          </View>
+          <Text style={[styles.quickTipText, { color: colors.text }]}>{recentIntelligence.message}</Text>
+          <Text style={[styles.quickTipSuggestion, { color: colors.textSecondary }]}>{recentIntelligence.suggestion}</Text>
         </View>
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -175,16 +212,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#34C759'
   },
   greetingSection: {
-    marginBottom: 24
+    marginBottom: 28,
+    marginTop: 8,
   },
   greeting: {
-    fontSize: 32,
-    fontWeight: '700',
-    marginBottom: 8
+    fontSize: 34,
+    fontWeight: '800',
+    marginBottom: 14,
+    letterSpacing: -0.5,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    gap: 8,
   },
   statusText: {
-    fontSize: 16,
-    lineHeight: 22
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -205,82 +254,167 @@ const styles = StyleSheet.create({
   },
   signalsGrid: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32
+    flexWrap: 'wrap',
+    gap: 14,
+    marginBottom: 36,
+  },
+  signalCardWrapper: {
+    width: '48%',
   },
   signalCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 18,
+    padding: 18,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    position: 'relative',
+    overflow: 'hidden',
   },
-  signalIcon: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#F0FBFF',
+  signalIconWrapper: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  signalLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  signalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  signalArrow: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    opacity: 0.4,
+  },
+  insightCardWrapper: {
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    position: 'relative',
+  },
+  insightIconGradient: {
+    width: 44,
+    height: 44,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12
-  },
-  signalLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4
-  },
-  signalValue: {
-    fontSize: 13
-  },
-  insightCard: {
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 32
-  },
-  insightIcon: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#D6F5FF',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center'
+    marginBottom: 14,
   },
   insightContent: {
-    flex: 1
+    flex: 1,
+    paddingRight: 24,
+  },
+  insightHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
   },
   insightLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     textTransform: 'uppercase',
-    marginBottom: 4
+    letterSpacing: 0.8,
+    opacity: 0.7,
+  },
+  riskBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  riskText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FF3B30',
   },
   insightTitle: {
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: '700',
-    color: '#1C1C1E',
-    marginBottom: 4
+    marginBottom: 8,
+    letterSpacing: -0.3,
   },
   insightDescription: {
     fontSize: 14,
-    color: '#636366',
-    lineHeight: 20
+    lineHeight: 21,
+    opacity: 0.85,
   },
-  insightText: {
+  insightArrow: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    opacity: 0.5,
+  },
+  quickTipCard: {
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  quickTipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  quickTipIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickTipLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    opacity: 0.7,
+  },
+  quickTipText: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 24,
+    marginBottom: 10,
+    letterSpacing: -0.2,
+  },
+  quickTipSuggestion: {
+    fontSize: 14,
+    lineHeight: 21,
+    opacity: 0.85,
+  },
+  viewAllLink: {
     fontSize: 15,
     fontWeight: '600',
-    lineHeight: 22,
-    marginBottom: 8
-  },
-  insightSuggestion: {
-    fontSize: 14,
-    lineHeight: 20
   },
   bottomSpacing: {
     height: 20

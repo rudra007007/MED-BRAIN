@@ -1,34 +1,18 @@
 import React from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, Share2, TrendingUp } from 'lucide-react-native';
-import ChartScrubber from '../components/ui/ChartScrubber';
+import { TrendingUp } from 'lucide-react-native';
+import ChartScrubber from '../../components/ui/ChartScrubber';
 
 export default function ActivityDetailScreen() {
-  const router = useRouter();
   const activityTrendData = [50, 45, 48, 52, 49, 51, 47];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Activity Detail</Text>
-        <TouchableOpacity style={styles.shareButton}>
-          <Share2 size={24} color="#2DD4BF" />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.metricsGrid}>
           <View style={styles.metricCard}>
@@ -94,19 +78,7 @@ export default function ActivityDetailScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
-          <Text style={styles.navLabel}>HOME</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>INSIGHTS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/insight')}>
-          <Text style={styles.navLabel}>TRENDS</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

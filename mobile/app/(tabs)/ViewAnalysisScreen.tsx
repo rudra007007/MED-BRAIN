@@ -9,19 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
-  Dimensions,
   Keyboard,
+  useColorScheme,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Send, Bot, User } from 'lucide-react-native';
-import { useColorScheme } from 'react-native';
 import { Colors } from '@/constants/theme';
-import { riskDriftData, patternInsights as mockPatternInsights } from '../../mocks/healthdata';
 import { useInsightsStore } from '../../store/insights.store';
-import { useSymptomStore } from '../../store/symptom.store';
 import { useBotStore } from '../../store/bot.store';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type Message = {
   id: string;
@@ -33,8 +28,7 @@ type Message = {
 export default function ViewAnalysisScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-  const { patternInsights, fetchPatternInsights } = useInsightsStore();
-  const { symptoms } = useSymptomStore();
+  const { fetchPatternInsights } = useInsightsStore();
   const { botMessage, setBotMessage, sendBotMessage } = useBotStore();
   const { bottom: safeBottomInset } = useSafeAreaInsets();
   const [messages, setMessages] = useState<Message[]>([
@@ -81,8 +75,6 @@ export default function ViewAnalysisScreen() {
     };
   }, [safeBottomInset]);
 
-  const insight = patternInsights?.[0] || mockPatternInsights[0];
-  const signals = insight?.signals?.length ? insight.signals : symptoms.map((s) => s.normalized);
 
   const handleSend = () => {
     if (botMessage.trim()) {
@@ -110,7 +102,7 @@ export default function ViewAnalysisScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={undefined}
@@ -139,7 +131,7 @@ export default function ViewAnalysisScreen() {
               >
                 {!message.isUser && (
                   <View style={[styles.avatar, styles.avatarBot]}>
-                    <Bot size={16} color="#06D6FF" />
+                    <Bot size={16} color="#4A90E2" />
                   </View>
                 )}
                 <View
@@ -176,7 +168,7 @@ export default function ViewAnalysisScreen() {
             {
               backgroundColor: colors.backgroundCard,
               borderTopColor: colors.border,
-              transform: [{ translateY: Animated.multiply(keyboardHeight.current, -1) }],
+              transform: [{ translateY: Animated.multiply(keyboardHeight.current, -0.87) }],
             },
           ]}
           onLayout={(event) => setChatBarHeight(event.nativeEvent.layout.height)}
@@ -214,7 +206,7 @@ export default function ViewAnalysisScreen() {
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -271,11 +263,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarBot: {
-    backgroundColor: 'rgba(6, 214, 255, 0.2)',
+    backgroundColor: '#E3F2FD',
     marginRight: 8,
   },
   avatarUser: {
-    backgroundColor: '#06D6FF',
+    backgroundColor: '#4A90E2',
     marginLeft: 8,
   },
   messageBubble: {

@@ -6,29 +6,13 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, Share2 } from 'lucide-react-native';
-import ChartScrubber from '../components/ui/ChartScrubber';
+import ChartScrubber from '../../components/ui/ChartScrubber';
 
 export default function RecoverySignalScreen() {
-  const router = useRouter();
   const hrvData = [60, 55, 70, 50, 75, 55, 62];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Recovery Signal</Text>
-        <TouchableOpacity style={styles.shareButton}>
-          <Share2 size={24} color="#2DD4BF" />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.hrvSection}>
           <View style={styles.hrvIcon}>
@@ -113,19 +97,7 @@ export default function RecoverySignalScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
-          <Text style={styles.navLabel}>HOME</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>INSIGHTS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/insight')}>
-          <Text style={styles.navLabel}>TRENDS</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
   Dimensions,
   Modal,
   ScrollView,
@@ -9,22 +8,15 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, useRouter } from 'expo-router';
 import {
   Activity,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle,
   Heart,
-  Info,
   Users,
-  Wind,
   X,
   Zap
 } from 'lucide-react-native';
-import ChartScrubber from '../components/ui/ChartScrubber';
-import { Colors } from '../constants/theme';
+import ChartScrubber from '../../components/ui/ChartScrubber';
+import { Colors } from '@/constants/theme';
 
 type ChartSection = {
   id: string;
@@ -42,7 +34,6 @@ type ChartSection = {
 };
 
 export default function PatternInsightsScreen() {
-  const router = useRouter();
   const [infoModalVisible, setInfoModalVisible] = useState(false);
 
   const chartSections: ChartSection[] = [
@@ -87,19 +78,7 @@ export default function PatternInsightsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: Colors.dark.background }]}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Interactive Lifestyle Trends</Text>
-        <TouchableOpacity style={styles.infoButton} onPress={() => setInfoModalVisible(true)}>
-          <Info size={24} color={Colors.dark.textSecondary} />
-        </TouchableOpacity>
-      </View>
-
+    <View style={[styles.container, { backgroundColor: Colors.dark.background }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>30-Day Relative Trends</Text>
@@ -169,9 +148,11 @@ export default function PatternInsightsScreen() {
             <Text style={styles.communityLabel}>Community Pulse</Text>
           </View>
           <Text style={styles.communityText}>
-            You are currently experiencing a similar "late-shift" drift as{' '}
-            <Text style={styles.communityHighlight}>14% of people</Text> in your city this week.
+            {`You are currently experiencing a similar "late-shift" drift as `}
+            <Text style={styles.communityHighlight}>14% of people</Text>
+            {` in your city this week.`}
           </Text>
+
         </View>
 
         <View style={styles.bottomSpacing} />
@@ -179,18 +160,7 @@ export default function PatternInsightsScreen() {
 
       <InfoModal visible={infoModalVisible} onClose={() => setInfoModalVisible(false)} />
 
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
-          <Text style={styles.navLabel}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Insights</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)/community')}>
-          <Text style={styles.navLabel}>Community</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

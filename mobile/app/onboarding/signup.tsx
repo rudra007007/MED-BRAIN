@@ -37,7 +37,7 @@ export default function SignUpScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      router.push('/personalize');
+      router.push('/onboarding/personalize');
     }, 1500);
   };
 

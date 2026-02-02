@@ -12,8 +12,7 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Send, Plus, ShieldCheck } from 'lucide-react-native';
+import { X, Send, Plus } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useCommunityStore, type ReactionType, type CommunityPost } from '@/store/community.store';
 import Post from '@/components/community/Post';
@@ -51,7 +50,7 @@ export default function CommunityScreen() {
     Object.keys(mockCommunityComments).forEach((postId) => {
       setComments(postId, mockCommunityComments[postId]);
     });
-  }, []);
+  }, [setComments, setPosts]);
 
   const handleReact = (postId: string, reactionType: ReactionType) => {
     const post = posts.find((p) => p.id === postId);
@@ -119,9 +118,9 @@ export default function CommunityScreen() {
   const postComments = selectedPostId ? comments[selectedPostId] || [] : [];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -138,17 +137,6 @@ export default function CommunityScreen() {
           <Plus size={20} color="#000" />
           <Text style={styles.addButtonText}>Share</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Community Info Card */}
-      <View style={[styles.infoCard, { backgroundColor: colors.backgroundAccent }]}>
-        <ShieldCheck size={20} color={colors.accent} />
-        <View style={styles.infoContent}>
-          <Text style={[styles.infoTitle, { color: colors.text }]}>Anonymous & Supportive</Text>
-          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-            Connect with others. All usernames are anonymized. This is a space for shared learning, not medical advice.
-          </Text>
-        </View>
       </View>
 
       {/* Posts Feed */}
@@ -268,7 +256,10 @@ export default function CommunityScreen() {
             </View>
 
             {/* Tag Selection */}
-            <Text style={[styles.inputLabel, { color: colors.text }]}>What's on your mind?</Text>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>
+              {"What's on your mind?"}
+            </Text>
+
             <View style={styles.tagSelector}>
               {(['Stabilizing', 'Recovering', 'Drift detected'] as const).map((tag) => (
                 <TouchableOpacity
@@ -281,16 +272,16 @@ export default function CommunityScreen() {
                           ? tag === 'Stabilizing'
                             ? 'rgba(0, 217, 159, 0.2)'
                             : tag === 'Recovering'
-                            ? 'rgba(6, 214, 255, 0.2)'
-                            : 'rgba(255, 184, 77, 0.2)'
+                              ? 'rgba(6, 214, 255, 0.2)'
+                              : 'rgba(255, 184, 77, 0.2)'
                           : colors.background,
                       borderColor:
                         selectedTag === tag
                           ? tag === 'Stabilizing'
                             ? '#00D99F'
                             : tag === 'Recovering'
-                            ? '#06D6FF'
-                            : '#FFB84D'
+                              ? '#06D6FF'
+                              : '#FFB84D'
                           : colors.border,
                     },
                   ]}
@@ -306,8 +297,8 @@ export default function CommunityScreen() {
                             ? tag === 'Stabilizing'
                               ? '#00D99F'
                               : tag === 'Recovering'
-                              ? '#06D6FF'
-                              : '#FFB84D'
+                                ? '#06D6FF'
+                                : '#FFB84D'
                             : colors.textTertiary,
                       },
                     ]}
@@ -335,13 +326,17 @@ export default function CommunityScreen() {
 
             {/* Post Guidelines */}
             <View style={styles.guidelines}>
-              <Text style={[styles.guidelinesTitle, { color: colors.text }]}>Community Guidelines</Text>
+              <Text style={[styles.guidelinesTitle, { color: colors.text }]}>
+                Community Guidelines
+              </Text>
+
               <Text style={[styles.guidelinesText, { color: colors.textTertiary }]}>
-                • Share experiences, not medical advice{'\n'}
-                • Be kind and supportive{'\n'}
-                • Respect everyone's journey
+                {`• Share experiences, not medical advice
+                  • Be kind and supportive
+                  • Respect everyone’s journey`}
               </Text>
             </View>
+
 
             {/* Post Button */}
             <TouchableOpacity
@@ -365,7 +360,7 @@ export default function CommunityScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 

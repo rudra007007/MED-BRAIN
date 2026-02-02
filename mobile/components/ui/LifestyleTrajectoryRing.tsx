@@ -6,7 +6,7 @@ import { Colors } from '@/constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CHART_SIZE = SCREEN_WIDTH * 0.75;
-const RING_STROKE_WIDTH = 12;
+const RING_STROKE_WIDTH = 8;
 const CENTER = CHART_SIZE / 2;
 
 interface LifestyleTrajectoryRingProps {
@@ -38,13 +38,13 @@ export default function LifestyleTrajectoryRing({
   const colors = Colors[colorScheme ?? 'dark'];
   const progressAnimation = useRef(new Animated.Value(0)).current;
 
-  // Neon gradient colors
-  const CYAN = '#00FFFF';
-  const BLUE = '#00E0FF';
-  const TEAL = '#00FFA3';
-  const DARK_TEAL = '#00FFD4';
-  const PURPLE = '#BF00FF';
-  const MAGENTA = '#FF00FF';
+  // Professional gradient colors - subtle and formal
+  const PRIMARY = colorScheme === 'dark' ? '#14f1d9' : '#4A90E2';
+  const SECONDARY = colorScheme === 'dark' ? '#4A90E2' : '#5BA3D0';
+  const TERTIARY = colorScheme === 'dark' ? '#6B7FDE' : '#7B68EE';
+  const ACCENT_LIGHT = colorScheme === 'dark' ? 'rgba(20, 241, 217, 0.6)' : 'rgba(74, 144, 226, 0.5)';
+  const ACCENT_MID = colorScheme === 'dark' ? 'rgba(74, 144, 226, 0.6)' : 'rgba(91, 163, 208, 0.5)';
+  const ACCENT_DARK = colorScheme === 'dark' ? 'rgba(107, 127, 222, 0.6)' : 'rgba(123, 104, 238, 0.5)';
 
   // Calculate arc paths for circular progress
   const calculateArc = (percentage: number, radius: number, startAngle = -90) => {
@@ -99,37 +99,37 @@ export default function LifestyleTrajectoryRing({
         <Svg width={CHART_SIZE} height={CHART_SIZE} viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}>
           <Defs>
             <LinearGradient id="outerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={CYAN} stopOpacity="1" />
-              <Stop offset="100%" stopColor={TEAL} stopOpacity="0.8" />
+              <Stop offset="0%" stopColor={PRIMARY} stopOpacity="0.9" />
+              <Stop offset="100%" stopColor={ACCENT_LIGHT} stopOpacity="0.7" />
             </LinearGradient>
             <LinearGradient id="middleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={PURPLE} stopOpacity="1" />
-              <Stop offset="100%" stopColor={MAGENTA} stopOpacity="0.8" />
+              <Stop offset="0%" stopColor={SECONDARY} stopOpacity="0.85" />
+              <Stop offset="100%" stopColor={ACCENT_MID} stopOpacity="0.65" />
             </LinearGradient>
             <LinearGradient id="innerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={BLUE} stopOpacity="1" />
-              <Stop offset="100%" stopColor={DARK_TEAL} stopOpacity="0.8" />
+              <Stop offset="0%" stopColor={TERTIARY} stopOpacity="0.8" />
+              <Stop offset="100%" stopColor={ACCENT_DARK} stopOpacity="0.6" />
             </LinearGradient>
           </Defs>
 
           {/* Background rings */}
           <Path 
             d={outerBgArc} 
-            stroke="rgba(255,255,255,0.08)" 
+            stroke={colorScheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'} 
             strokeWidth={RING_STROKE_WIDTH} 
             fill="none" 
             strokeLinecap="round"
           />
           <Path 
             d={middleBgArc} 
-            stroke="rgba(255,255,255,0.07)" 
+            stroke={colorScheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'} 
             strokeWidth={RING_STROKE_WIDTH} 
             fill="none" 
             strokeLinecap="round"
           />
           <Path 
             d={innerBgArc} 
-            stroke="rgba(255,255,255,0.06)" 
+            stroke={colorScheme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'} 
             strokeWidth={RING_STROKE_WIDTH} 
             fill="none" 
             strokeLinecap="round"
@@ -171,9 +171,9 @@ export default function LifestyleTrajectoryRing({
               x={CENTER}
               y={CENTER - 18}
               textAnchor="middle"
-              fill={CYAN}
-              fontSize="56"
-              fontWeight="700"
+              fill={PRIMARY}
+              fontSize="52"
+              fontWeight="600"
               letterSpacing="-1"
             >
               {Math.round(primaryValue)}
@@ -183,9 +183,10 @@ export default function LifestyleTrajectoryRing({
                 x={CENTER}
                 y={CENTER + 20}
                 textAnchor="middle"
-                fill={BLUE}
-                fontSize="28"
-                fontWeight="600"
+                fill={SECONDARY}
+                fontSize="26"
+                fontWeight="500"
+                opacity="0.85"
               >
                 {Math.round(secondaryValue)}
               </SvgText>
@@ -197,16 +198,16 @@ export default function LifestyleTrajectoryRing({
       {/* Stats below ring */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: CYAN }]}>
-            ❤️ {routineConsistency}
+          <Text style={[styles.statValue, { color: PRIMARY }]}>
+            {routineConsistency}%
           </Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Heart Pts</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Consistency</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: BLUE }]}>
-            👟 {lifestyleDrift}
+          <Text style={[styles.statValue, { color: SECONDARY }]}>
+            {lifestyleDrift}%
           </Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Steps</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Lifestyle</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -215,15 +216,16 @@ export default function LifestyleTrajectoryRing({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 24,
-    padding: 32,
+    borderRadius: 20,
+    padding: 28,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    marginBottom: 24,
   },
   chartWrapper: {
     alignItems: 'center',
@@ -233,19 +235,23 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 48,
+    gap: 56,
     width: '100%',
   },
   statItem: {
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   statValue: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '600',
+    letterSpacing: -0.5,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    opacity: 0.7,
   },
 });
