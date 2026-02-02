@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Menu, User } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'react-native';
@@ -23,32 +24,34 @@ export default function AppHeader({ userName = 'Alex', onMenuPress }: AppHeaderP
   };
 
   return (
-    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      {/* Profile Button */}
-      <TouchableOpacity
-        style={[styles.profileButton, { backgroundColor: colors.backgroundCard, borderColor: colors.accent }]}
-        onPress={() => router.push('/profile')}
-        activeOpacity={0.7}
-      >
-        <User size={20} color={colors.accent} />
-      </TouchableOpacity>
+    <SafeAreaView edges={['top']} style={{ backgroundColor: colors.background }}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+        {/* Profile Button */}
+        <TouchableOpacity
+          style={[styles.profileButton, { backgroundColor: colors.backgroundCard, borderColor: colors.accent }]}
+          onPress={() => router.push('/profile')}
+          activeOpacity={0.7}
+        >
+          <User size={20} color={colors.accent} />
+        </TouchableOpacity>
 
-      {/* Title */}
-      <View style={styles.titleContainer}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          {userName}
-        </Text>
+        {/* Title */}
+        <View style={styles.titleContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {userName}
+          </Text>
+        </View>
+
+        {/* Menu Button */}
+        <TouchableOpacity
+          style={[styles.menuButton, { backgroundColor: colors.backgroundCard }]}
+          onPress={handleMenuPress}
+          activeOpacity={0.7}
+        >
+          <Menu size={20} color={colors.accent} />
+        </TouchableOpacity>
       </View>
-
-      {/* Menu Button */}
-      <TouchableOpacity
-        style={[styles.menuButton, { backgroundColor: colors.backgroundCard }]}
-        onPress={handleMenuPress}
-        activeOpacity={0.7}
-      >
-        <Menu size={20} color={colors.accent} />
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
