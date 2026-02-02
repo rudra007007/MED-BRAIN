@@ -43,7 +43,6 @@ type ChartSection = {
 
 export default function PatternInsightsScreen() {
   const router = useRouter();
-  const [infoModalVisible, setInfoModalVisible] = useState(false);
 
   const chartSections: ChartSection[] = [
     {
@@ -95,7 +94,7 @@ export default function PatternInsightsScreen() {
           <ArrowLeft size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Interactive Lifestyle Trends</Text>
-        <TouchableOpacity style={styles.infoButton} onPress={() => setInfoModalVisible(true)}>
+        <TouchableOpacity style={styles.infoButton}>
           <Info size={24} color={Colors.dark.textSecondary} />
         </TouchableOpacity>
       </View>
@@ -176,8 +175,6 @@ export default function PatternInsightsScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-
-      <InfoModal visible={infoModalVisible} onClose={() => setInfoModalVisible(false)} />
 
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(tabs)')}>
@@ -383,143 +380,5 @@ const styles = StyleSheet.create({
   },
   navLabelActive: {
     color: '#14f1d9'
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end'
-  },
-  modalContainer: {
-    backgroundColor: '#0a0e0f',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: Dimensions.get('window').height * 0.85,
-    minHeight: Dimensions.get('window').height * 0.5
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF'
-  },
-  modalCloseButton: {
-    padding: 4
-  },
-  modalScroll: {
-    flex: 1
-  },
-  modalContent: {
-    padding: 20,
-    paddingBottom: 40
-  },
-  modalDescription: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
-    lineHeight: 20,
-    marginBottom: 24
-  },
-  infoSection: {
-    marginBottom: 20
-  },
-  infoSectionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 6
-  },
-  infoSectionDescription: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
-    lineHeight: 18
-  },
-  modalFooter: {
-    marginTop: 24,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)'
-  },
-  modalFooterText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
-    textAlign: 'center'
   }
 });
-
-type InfoModalProps = {
-  visible: boolean;
-  onClose: () => void;
-};
-
-function InfoModal({ visible, onClose }: InfoModalProps) {
-  const infoSections = [
-    {
-      title: 'Sleep Consistency',
-      description: 'Measures the regularity of your sleep schedule based on bedtime and wake time patterns. Consistent sleep helps regulate your circadian rhythm.'
-    },
-    {
-      title: 'Physical Load',
-      description: "Tracks your daily activity volume and intensity. Helps identify if you are overtraining or maintaining balanced activity levels."
-    },
-    {
-      title: 'Circadian Consistency',
-      description: 'Evaluates how steady your daily routines are, including meal times, light exposure, and activity patterns that influence your body clock.'
-    },
-    {
-      title: 'Drift Analysis',
-      description: 'Detects gradual shifts in your biological timing. Drifts can indicate stress, lifestyle changes, or emerging health patterns.'
-    },
-    {
-      title: 'Community Pulse',
-      description: 'Anonymous comparison of your trends against similar users in your area. Shows how your patterns align with peer groups.'
-    }
-  ];
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>About Insights</Text>
-            <TouchableOpacity onPress={onClose} style={styles.modalCloseButton}>
-              <X size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.modalScroll}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalDescription}>
-                Interactive Lifestyle Trends analyzes your health data to provide personalized insights about your daily patterns and biological rhythms.
-              </Text>
-
-              {infoSections.map((section, index) => (
-                <View key={index} style={styles.infoSection}>
-                  <Text style={styles.infoSectionTitle}>{section.title}</Text>
-                  <Text style={styles.infoSectionDescription}>{section.description}</Text>
-                </View>
-              ))}
-
-              <View style={styles.modalFooter}>
-                <Text style={styles.modalFooterText}>
-                  Data is analyzed locally and never shared without your consent.
-                </Text>
-              </View>
-            </View>
-          </ScrollView>
-        </View>
-      </View>
-    </Modal>
-  );
-}
