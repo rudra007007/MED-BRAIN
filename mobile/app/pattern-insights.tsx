@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -20,85 +20,88 @@ import {
   Wind,
   Zap
 } from 'lucide-react-native';
-import { useInsightsStore } from '../store/insights.store';
+import ChartScrubber from '../components/ui/ChartScrubber';
+import { Colors } from '../constants/theme';
+
+type ChartSection = {
+  id: string;
+  title: string;
+  subtitle: string;
+  status: string;
+  statusColor: string;
+  data: number[];
+  gradientColor: string;
+  icon: React.ReactNode;
+  insight?: {
+    title: string;
+    description: string;
+  };
+};
 
 export default function PatternInsightsScreen() {
   const router = useRouter();
-  const { patternInsights, loadingInsights } = useInsightsStore();
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    setIsLoading(loadingInsights);
-  }, [loadingInsights]);
-
-  const insight = patternInsights[0] || {
-    title: 'Sleep Quality Decline',
-    description: 'Your sleep patterns show significant changes',
-    signals: ['Fatigue', 'Late-night Screen', 'Morning Stiffness'],
-    riskChange: 12,
-    timeframe: 'Last 7 days',
-    confidence: 0.85,
-    explanation: 'Late evening screen exposure correlates with reduced sleep duration.',
-    communityComparison:
-      '73% of users with similar patterns report improved sleep after lifestyle adjustments',
-    correlation: 'evening screen usage and sleep quality'
-  };
-
-  const getSignalIcon = (signal: string) => {
-    const signalLower = signal.toLowerCase();
-    if (signalLower.includes('fatigue') || signalLower.includes('energy')) return Activity;
-    if (signalLower.includes('screen')) return Zap;
-    if (signalLower.includes('heart')) return Heart;
-    return Wind;
-  };
-
-  const riskData = [0.4, 0.42, 0.5, 0.58, 0.72, 0.8, 0.88];
+  const chartSections: ChartSection[] = [
+    {
+      id: 'sleep',
+      title: 'Sleep Consistency',
+      subtitle: 'Circadian Signal',
+      status: 'Drifting Later',
+      statusColor: '#14f1d9',
+      data: [80, 75, 85, 60, 45, 40, 35],
+      gradientColor: '#14f1d9',
+      icon: <Heart size={20} color="#14f1d9" />,
+      insight: {
+        title: 'Change Point Identified',
+        description: 'Sleep onset has drifted 45 minutes later over the last 4 days.'
+      }
+    },
+    {
+      id: 'physical',
+      title: 'Physical Load',
+      subtitle: 'Volume Index',
+      status: 'Stable',
+      statusColor: '#ffffff',
+      data: [60, 65, 62, 64, 58, 61, 65],
+      gradientColor: '#2d9aff',
+      icon: <Activity size={20} color="#2d9aff" />
+    },
+    {
+      id: 'circadian',
+      title: 'Circadian Consistency',
+      subtitle: 'Routine Stability',
+      status: 'High Variance',
+      statusColor: '#2d9aff',
+      data: [60, 20, 100, 30, 90, 40, 75],
+      gradientColor: '#2d9aff',
+      icon: <Zap size={20} color="#2d9aff" />,
+      insight: {
+        title: 'Routine Disruption',
+        description: 'Variance in meal times and light exposure has increased by 18% compared to last month.'
+      }
+    }
+  ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: Colors.dark.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#1C1C1E" />
+          <ArrowLeft size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Symptom Insight</Text>
+        <Text style={styles.headerTitle}>Interactive Lifestyle Trends</Text>
         <TouchableOpacity style={styles.infoButton}>
-          <Info size={24} color={colors.textSecondary} />
+          <Info size={24} color={Colors.dark.textSecondary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {isLoading && patternInsights.length === 0 ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#06D6FF" />
-            <Text style={styles.loadingText}>Loading insights...</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.heroCard}>
-          <View style={styles.heroWaves}>
-            <View style={[styles.heroWave, styles.heroWave1]} />
-            <View style={[styles.heroWave, styles.heroWave2]} />
-            <View style={[styles.heroWave, styles.heroWave3]} />
-          </View>
-          <View style={styles.heroBadges}>
-            <View style={styles.heroBadge}>
-              <Text style={styles.heroBadgeText}>PRIMARY EXTRACTION</Text>
-            </View>
-            <View style={[styles.heroBadge, styles.heroBadgeSuccess]}>
-              <CheckCircle size={14} color="#34C759" />
-              <Text style={[styles.heroBadgeText, styles.heroBadgeSuccessText]}>
-                PATTERN MATCH: HIGH
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.heroTitle}>{insight.title}</Text>
-          <Text style={styles.heroDescription}>{insight.description}</Text>
-        </View>
-
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Extracted Signals</Text>
-          <Text style={styles.signalCount}>{insight.signals?.length || 0} signals found</Text>
+          <Text style={styles.sectionTitle}>30-Day Relative Trends</Text>
+          <Text style={styles.sectionDescription}>
+            Comparison of biological signals against baseline. Scrub the charts to see precise daily variance.
+          </Text>
         </View>
 
         {chartSections.map((section) => (
@@ -109,73 +112,61 @@ export default function PatternInsightsScreen() {
                 <Text style={styles.chartSubtitle}>{section.subtitle}</Text>
               </View>
               <View
-                key={index}
-                style={[styles.signalChip, isHighlighted && styles.signalChipHighlighted]}
+                style={[
+                  styles.statusBadge,
+                  { borderColor: section.statusColor }
+                ]}
               >
-                <Icon size={16} color={isHighlighted ? '#06D6FF' : '#636366'} />
-                <Text style={[styles.signalChipText, isHighlighted && styles.signalChipTextHighlighted]}>
-                  {signal}
+                <Text style={[styles.statusText, { color: section.statusColor }]}>
+                  {section.status}
                 </Text>
               </View>
             </View>
 
-        <View style={styles.riskCard}>
-          <View style={styles.riskHeader}>
-            <Text style={styles.riskLabel}>LIFESTYLE RISK DRIFT</Text>
-            <View style={styles.riskBadge}>
-              <Text style={styles.riskPercent}>+{insight.riskChange}%</Text>
-              <Text style={styles.riskSubtext}>ABOVE BASELINE</Text>
+            <View style={styles.chartContainer}>
+              <ChartScrubber
+                data={section.data}
+                height={120}
+                gradientFrom={section.gradientColor}
+                gradientTo={section.gradientColor}
+              />
             </View>
-          </View>
-          <Text style={styles.riskTimeframe}>{insight.timeframe}</Text>
 
-          <View style={styles.riskChart}>
-            {riskData.map((value, index) => (
-              <View key={index} style={styles.riskBar}>
-                <View
-                  style={[
-                    styles.riskBarFill,
-                    {
-                      height: `${value * 100}%`,
-                      backgroundColor: index >= 4 ? '#06D6FF' : '#B8EEFF'
-                    }
-                  ]}
-                />
+            {section.insight && (
+              <View style={styles.insightCard}>
+                <View style={styles.insightHeader}>
+                  <View
+                    style={[
+                      styles.insightIcon,
+                      { backgroundColor: section.statusColor + '20' }
+                    ]}
+                  >
+                    {section.icon}
+                  </View>
+                  <View style={styles.insightContent}>
+                    <Text style={styles.insightTitle}>{section.insight.title}</Text>
+                    <Text style={styles.insightDescription}>{section.insight.description}</Text>
+                  </View>
+                </View>
               </View>
-            ))}
+            )}
+
+            {section.id === 'physical' && (
+              <Text style={styles.chartNote}>
+                Movement volume remains within 5% of your 90-day baseline.
+              </Text>
+            )}
           </View>
-        </View>
+        ))}
 
-        <View style={styles.meaningCard}>
-          <View style={styles.meaningHeader}>
-            <View style={styles.meaningIcon}>
-              <Info size={20} color="#06D6FF" />
-            </View>
-            <Text style={styles.meaningTitle}>What this means</Text>
+        <View style={styles.communitySection}>
+          <View style={styles.communityHeader}>
+            <Users size={18} color="rgba(255,255,255,0.3)" />
+            <Text style={styles.communityLabel}>Community Pulse</Text>
           </View>
-          <Text style={styles.meaningText}>
-            Your logs suggest a strong correlation between{' '}
-            <Text style={styles.meaningHighlight}>{insight.correlation}</Text>.
-          </Text>
-          <Text style={styles.meaningExplanation}>{insight.explanation}</Text>
-        </View>
-
-        {insight.communityComparison ? (
-          <View style={styles.communityCard}>
-            <Users size={18} color="#8E8E93" />
-            <Text style={styles.communityText}>{insight.communityComparison}</Text>
-          </View>
-        ) : null}
-
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
-          <Text style={styles.actionButtonText}>Explore Lifestyle Adjustments</Text>
-          <ArrowRight size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Pattern Insights provides health intelligence based on user logs. This is not a medical
-            diagnosis or clinical advice.
+          <Text style={styles.communityText}>
+            You are currently experiencing a similar "late-shift" drift as{' '}
+            <Text style={styles.communityHighlight}>14% of people</Text> in your city this week.
           </Text>
         </View>
 
@@ -200,7 +191,7 @@ export default function PatternInsightsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA'
+    backgroundColor: '#0a0e0f'
   },
   header: {
     flexDirection: 'row',
@@ -215,136 +206,41 @@ const styles = StyleSheet.create({
     padding: 8
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1C1C1E'
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    flex: 1,
+    textAlign: 'center'
   },
   infoButton: {
     padding: 8
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 40
-  },
-  heroCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    marginBottom: 24,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E8E8EB'
-  },
-  heroWaves: {
-    height: 80,
-    backgroundColor: '#F0F9FF',
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-    flexDirection: 'row',
-    alignItems: 'flex-end'
-  },
-  heroWave: {
-    flex: 1,
-    backgroundColor: '#06D6FF',
-    opacity: 0.3,
-    height: '40%',
-    marginHorizontal: 2
-  },
-  heroWave1: {
-    height: '30%'
-  },
-  heroWave2: {
-    height: '50%'
-  },
-  heroWave3: {
-    height: '35%'
-  },
-  heroBadges: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingTop: 12
-  },
-  heroBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    backgroundColor: '#F0F0F0'
-  },
-  heroBadgeSuccess: {
-    backgroundColor: '#E8F5E9'
-  },
-  heroBadgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#1C1C1E'
-  },
-  heroBadgeSuccessText: {
-    color: '#34C759'
-  },
-  heroTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1C1C1E',
-    paddingHorizontal: 16,
-    paddingTop: 16
-  },
-  heroDescription: {
-    fontSize: 14,
-    color: '#636366',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    lineHeight: 20
+    paddingVertical: 20,
+    paddingBottom: 100
   },
   sectionHeader: {
     marginBottom: 24
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1C1C1E'
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 8
   },
-  signalCount: {
-    fontSize: 12,
-    color: '#8E8E93'
+  sectionDescription: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.5)',
+    lineHeight: 20
   },
-  signalsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 24
-  },
-  signalChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F7',
+  chartCard: {
+    backgroundColor: '#161c1e',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E8E8EB'
-  },
-  signalChipHighlighted: {
-    backgroundColor: '#E0F7FF',
-    borderColor: '#06D6FF'
-  },
-  signalChipText: {
-    fontSize: 13,
-    color: '#636366',
-    fontWeight: '500'
-  },
-  signalChipTextHighlighted: {
-    color: '#06D6FF',
-    fontWeight: '600'
-  },
-  riskCard: {
-    backgroundColor: '#FFF5E6',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24
+    borderColor: 'rgba(255,255,255,0.05)',
+    padding: 20,
+    marginBottom: 16
   },
   cardHeader: {
     flexDirection: 'row',
@@ -372,43 +268,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: 'rgba(255,255,255,0.03)'
   },
-  riskPercent: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FF6B35'
-  },
-  riskSubtext: {
+  statusText: {
     fontSize: 10,
-    color: '#FF6B35',
-    marginTop: 2
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5
   },
-  riskTimeframe: {
-    fontSize: 12,
-    color: '#636366',
-    marginBottom: 16
-  },
-  riskChart: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-around',
-    height: 100,
-    gap: 4
-  },
-  riskBar: {
-    flex: 1,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 4,
+  chartContainer: {
+    height: 120,
+    marginBottom: 16,
+    borderRadius: 8,
     overflow: 'hidden'
   },
-  riskBarFill: {
-    width: '100%',
-    borderRadius: 4
-  },
-  meaningCard: {
-    backgroundColor: '#F0F9FF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24
+  insightCard: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+    padding: 12
   },
   insightHeader: {
     flexDirection: 'row',
@@ -421,45 +298,65 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  meaningTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#06D6FF'
+  insightContent: {
+    flex: 1
   },
-  meaningText: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#1C1C1E',
+  insightTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4
+  },
+  insightDescription: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.6)',
+    lineHeight: 16
+  },
+  chartNote: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginTop: 12
+  },
+  communitySection: {
+    marginTop: 24,
+    marginBottom: 24
+  },
+  communityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 12
   },
-  meaningHighlight: {
+  communityLabel: {
+    fontSize: 11,
     fontWeight: '700',
-    color: '#1C1C1E'
+    color: 'rgba(255,255,255,0.3)',
+    textTransform: 'uppercase',
+    letterSpacing: 1
   },
   communityText: {
     fontSize: 14,
-    lineHeight: 21,
-    color: '#636366'
+    color: 'rgba(255,255,255,0.5)',
+    lineHeight: 20
   },
-  communityCard: {
-    backgroundColor: '#F5F5F7',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'flex-start',
-    marginBottom: 24
+  communityHighlight: {
+    color: '#14f1d9',
+    fontWeight: '600'
   },
-  communityText: {
-    flex: 1,
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#636366'
+  bottomSpacing: {
+    height: 20
   },
-  actionButton: {
-    backgroundColor: '#06D6FF',
-    borderRadius: 12,
-    padding: 18,
+  navBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: 'rgba(10, 14, 15, 0.9)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.05)',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -476,33 +373,9 @@ const styles = StyleSheet.create({
   navLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#FFFFFF'
+    color: 'rgba(255,255,255,0.4)'
   },
-  footer: {
-    backgroundColor: '#FFF9E6',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 32
-  },
-  footerText: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: '#636366',
-    textAlign: 'center',
-    fontStyle: 'italic'
-  },
-  loadingContainer: {
-    padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#8E8E93',
-    fontWeight: '500'
-  },
-  bottomSpacing: {
-    height: 20
+  navLabelActive: {
+    color: '#14f1d9'
   }
 });
