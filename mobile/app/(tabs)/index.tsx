@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles } from 'lucide-react-native';
+import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Sparkles, Smartphone } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { currentHealthSignals, riskDriftData, recentIntelligence } from '../../mocks/healthdata';
+import { currentHealthSignals, riskDriftData, recentIntelligence, lifestyleTrajectoryRing } from '../../mocks/healthdata';
 import type { HealthSignal } from '../../types/health';
 import { useAnalyticsStore } from '../../store/analytics.store';
 import { useHealthStore } from '../../store/health.store';
 import { useInsightsStore } from '../../store/insights.store';
 import { Colors } from '@/constants/theme';
+import LifestyleTrajectoryRing from '@/components/ui/LifestyleTrajectoryRing';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -39,6 +40,8 @@ export default function HomeScreen() {
         return <ActivityIcon size={28} color="#06D6FF" />;
       case 'recovery':
         return <Heart size={28} color="#06D6FF" />;
+      case 'screen':
+        return <Smartphone size={28} color="#06D6FF" />;
       default:
         return null;
     }
@@ -47,50 +50,18 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.profilePic}
-            onPress={() => router.push('/profile')}
-          >
-            <Text style={[styles.profileText, { color: colors.text }]}>A</Text>
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Health Intelligence</Text>
-          <View style={styles.logoContainer}>
-            <View style={[styles.statusDot, backendStatus && styles.statusDotActive]} />
-            <Sparkles size={24} color={colors.accent} />
-          </View>
-        </View>
 
         <View style={styles.greetingSection}>
           <Text style={[styles.greeting, { color: colors.text }]}>{getTimeGreeting()}, Alex</Text>
           <Text style={[styles.statusText, { color: colors.textSecondary }]}>{riskDriftData.message}</Text>
         </View>
 
-        <TouchableOpacity
-          style={[styles.riskCard, { backgroundColor: colors.backgroundCard }]}
-          activeOpacity={0.9}
+        <LifestyleTrajectoryRing
+          lifestyleDrift={lifestyleTrajectoryRing.lifestyleDrift}
+          riskTrajectory={lifestyleTrajectoryRing.riskTrajectory}
+          routineConsistency={lifestyleTrajectoryRing.routineConsistency}
           onPress={() => router.push('/pattern-insights')}
-        >
-          <View style={[styles.riskCardHeader, { backgroundColor: colors.backgroundAccent }]}>
-            <View style={styles.waveBackground}>
-              <View style={[styles.wave, { backgroundColor: colors.backgroundAccentSecondary }]} />
-              <View style={[styles.wave, styles.wave2, { backgroundColor: colors.backgroundAccentSecondary }]} />
-            </View>
-            <Text style={[styles.riskStatus, { color: colors.accent }]}>Stable</Text>
-            <View style={styles.riskBadge}>
-              <Text style={[styles.riskBadgeText, { color: colors.accent }]}>→ LOW RISK DRIFT</Text>
-            </View>
-          </View>
-
-          <View style={styles.riskCardContent}>
-            <Text style={[styles.aiLabel, { color: colors.textSecondary }]}>AI ANALYSIS</Text>
-            <Text style={[styles.riskTitle, { color: colors.text }]}>Risk Drift Indicator</Text>
-            <Text style={[styles.riskDescription, { color: colors.textSecondary }]}>{riskDriftData.description}</Text>
-            <View style={styles.viewButton}>
-              <Text style={[styles.viewButtonText, { color: '#FFFFFF' }]}>View Analysis</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+        />
 
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Current Health Signals</Text>
@@ -214,92 +185,6 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 16,
     lineHeight: 22
-  },
-  riskCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3
-  },
-  riskCardHeader: {
-    backgroundColor: '#D6F5FF',
-    paddingTop: 40,
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    position: 'relative',
-    overflow: 'hidden'
-  },
-  waveBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0
-  },
-  wave: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#B8EEFF',
-    opacity: 0.4,
-    borderRadius: 100,
-    transform: [{ scaleX: 3 }],
-    top: 20
-  },
-  wave2: {
-    top: 40,
-    opacity: 0.3
-  },
-  riskStatus: {
-    fontSize: 48,
-    fontWeight: '800',
-    marginBottom: 8
-  },
-  riskBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(6, 214, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6
-  },
-  riskBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.5
-  },
-  riskCardContent: {
-    padding: 24
-  },
-  aiLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
-    marginBottom: 8
-  },
-  riskTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 12
-  },
-  riskDescription: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 20
-  },
-  viewButton: {
-    backgroundColor: '#06D6FF',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center'
-  },
-  viewButtonText: {
-    fontSize: 16,
-    fontWeight: '600'
   },
   sectionHeader: {
     flexDirection: 'row',

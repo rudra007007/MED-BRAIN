@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -9,6 +8,7 @@ import {
     Switch,
     ActivityIndicator
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, Shield, Lock, VenetianMask as Mask, Check } from 'lucide-react-native';
 

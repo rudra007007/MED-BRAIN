@@ -40,13 +40,13 @@ export default function CommunityScreen() {
   const getStatusBg = (status: string) => {
     switch (status) {
       case 'rising':
-        return '#FFE5E5';
+        return 'rgba(255, 107, 107, 0.15)';
       case 'improving':
-        return '#E5F7E5';
+        return 'rgba(0, 217, 159, 0.15)';
       case 'emerging':
-        return '#FFF4E0';
+        return 'rgba(255, 193, 7, 0.15)';
       default:
-        return '#F5F5F7';
+        return 'rgba(255, 255, 255, 0.1)';
     }
   };
 
@@ -63,12 +63,6 @@ export default function CommunityScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Community Trends</Text>
-          <TouchableOpacity style={[styles.filterButton, { backgroundColor: colors.backgroundCard, borderColor: colors.border }]}>
-            <Text style={[styles.filterText, { color: colors.text }]}>Filter</Text>
-          </TouchableOpacity>
-        </View>
 
         <View style={[styles.infoCard, { backgroundColor: colors.backgroundAccent }]}>
           <Shield size={20} color={colors.accent} />
@@ -115,25 +109,28 @@ export default function CommunityScreen() {
           const statusBg = getStatusBg(trend.status);
 
           return (
-            <TouchableOpacity key={trend.id} style={styles.trendCard} activeOpacity={0.7}>
+            <TouchableOpacity key={trend.id} style={[styles.trendCard, { backgroundColor: colors.backgroundCard }]} activeOpacity={0.85}>
+              {chartImage && (
+                <View style={styles.chartContainer}>
+                  <Image source={{ uri: chartImage }} style={styles.trendChart} />
+                  <View style={styles.chartOverlay} />
+                </View>
+              )}
               <View style={styles.trendContent}>
                 <View style={[styles.trendBadge, { backgroundColor: statusBg }]}>
                   {getStatusIcon(trend.status)}
                   <Text style={[styles.trendBadgeText, { color: statusColor }]}>
-                    {trend.status.toUpperCase().replace('-', ' ')}
+                    {trend.status.toUpperCase()}
                   </Text>
                 </View>
-                <Text style={[styles.trendTitle, { color: colors.text }]}>{trend.title}</Text>
-                <Text style={[styles.trendDescription, { color: colors.textSecondary }]}>{trend.description}</Text>
-                <View style={styles.trendAction}>
-                  <Text style={[styles.trendActionText, { color: colors.accent }]}>
-                    {trend.status === 'rising' ? 'View Deep Dive' : trend.status === 'improving' ? 'Details' : 'Compare Lifestyle'}
+                <Text style={[styles.trendTitle, { color: colors.text }]} numberOfLines={2}>{trend.title}</Text>
+                <Text style={[styles.trendDescription, { color: colors.textSecondary }]} numberOfLines={3}>{trend.description}</Text>
+                <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
+                  <Text style={styles.actionButtonText}>
+                    {trend.status === 'rising' ? 'View Analysis' : trend.status === 'improving' ? 'Learn More' : 'Compare'}
                   </Text>
-                </View>
+                </TouchableOpacity>
               </View>
-              {chartImage && (
-                <Image source={{ uri: chartImage }} style={styles.trendChart} />
-              )}
             </TouchableOpacity>
           );
         })}
@@ -161,6 +158,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingTop: 12,
   },
   header: {
     flexDirection: 'row',
@@ -266,69 +264,93 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   trendCard: {
-    backgroundColor: '#1A2942',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    width: '100%',
+    borderRadius: 24,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-    flexDirection: 'row',
-    gap: 16,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  chartContainer: {
+    position: 'relative',
+  },
+  chartOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
   },
   trendContent: {
-    flex: 1,
+    padding: 24,
   },
   trendBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 6,
-    gap: 4,
-    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   trendBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.5,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
   trendTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: 10,
+    lineHeight: 24,
+    letterSpacing: -0.3,
   },
   trendDescription: {
     fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 12,
+    lineHeight: 21,
+    marginBottom: 20,
+    opacity: 0.8,
   },
-  trendAction: {
+  actionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     alignSelf: 'flex-start',
+    shadowColor: '#06D6FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  trendActionText: {
-    fontSize: 15,
-    fontWeight: '600',
+  actionButtonText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   trendChart: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
+    width: '100%',
+    height: 150,
+    backgroundColor: '#0A1929',
   },
   statsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 8,
+    marginTop: 24,
     marginBottom: 32,
+    paddingHorizontal: 20,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#1A2942',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   statLabel: {
     fontSize: 11,

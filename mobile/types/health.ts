@@ -57,3 +57,16 @@ export interface CommunityTrend {
   status: 'rising' | 'emerging' | 'improving' | 'stable';
   chart?: string;
 }
+
+export interface RiskTrajectory {
+  previous: number;
+  current: number;
+  trend: 'increasing' | 'stable' | 'improving';
+}
+
+export interface LifestyleTrajectoryRing {
+  lifestyleDrift: number;
+  riskTrajectory: RiskTrajectory;
+  routineConsistency: number;
+  daysAnalyzed: number;
+}

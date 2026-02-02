@@ -1,10 +1,13 @@
 import { Tabs } from "expo-router";
 import { Home, TrendingUp, Users, BarChart3 } from "lucide-react-native";
 import React from "react";
+import AppHeader from "@/components/common/AppHeader";
 
 export default function TabLayout() {
   return (
-    <Tabs
+    <>
+      <AppHeader userName="Alex" />
+      <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#14f1d9',
         tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
@@ -41,10 +44,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="insight"
+        name="ViewAnalysisScreen"
         options={{
-          title: "Insights",
-          tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
+          title: "Analysis",
+          tabBarIcon: ({ color }) => <BarChart3 size={24} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -55,12 +58,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="ViewAnalysisScreen"
+        name="insight"
         options={{
-          title: "Analysis",
-          tabBarIcon: ({ color }) => <BarChart3 size={24} color={color} />,
-        }} 
+          title: "Insights",
+          tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
+        }}
       />
     </Tabs>
+    </>
   );
 }

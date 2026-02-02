@@ -1,16 +1,21 @@
-import { HealthSignal, RiskDriftData, TrendData, PatternInsight, CommunityTrend, ContributingFactor } from '../types/health';
+import { HealthSignal, RiskDriftData, TrendData, PatternInsight, CommunityTrend, ContributingFactor, LifestyleTrajectoryRing } from '../types/health';
 
 export const currentHealthSignals: HealthSignal[] = [
   { id: '1', type: 'sleep', label: 'Sleep', value: '82% Quality', quality: 82 },
   { id: '2', type: 'activity', label: 'Activity', value: '6.4k steps' },
   { id: '3', type: 'recovery', label: 'Recovery', value: '55ms HRV' },
+  { id: '4', type: 'screen', label: 'Screen Time', value: '4.2h today' },
 ];
 
-export const riskDriftData: RiskDriftData = {
-  status: 'stable',
-  message: 'Your signals are looking stable today.',
-  description: 'Your lifestyle patterns show minimal deviation from your healthy baseline over the last 7 days.',
-  daysAnalyzed: 7,
+export const lifestyleTrajectoryRing: LifestyleTrajectoryRing = {
+  lifestyleDrift: 18,
+  riskTrajectory: {
+    previous: 42,
+    current: 57,
+    trend: 'increasing',
+  },
+  routineConsistency: 76,
+  daysAnalyzed: 21,
 };
 
 export const trendDataList: TrendData[] = [
@@ -100,6 +105,13 @@ export const contributingFactors: ContributingFactor[] = [
     detail: 'Relative to average weekday activity',
   },
 ];
+
+export const riskDriftData: RiskDriftData = {
+  status: 'stable',
+  message: 'Your signals are looking stable today.',
+  description: 'Your lifestyle patterns show minimal deviation from your healthy baseline over the last 21 days.',
+  daysAnalyzed: 21,
+};
 
 export const recentIntelligence = {
   message: 'Your recovery is slightly lower today, likely due to a shorter deep sleep phase last night.',
