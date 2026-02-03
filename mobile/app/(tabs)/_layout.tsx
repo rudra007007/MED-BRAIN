@@ -1,10 +1,11 @@
 import { Tabs, useRouter, usePathname } from "expo-router";
-import { Home, TrendingUp, Users, BarChart3, Bell, Bot } from "lucide-react-native";
-import React, { useCallback, useRef, useState } from "react";
+import { Home, TrendingUp, Users, BarChart3, Bell } from "lucide-react-native";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 import { Animated, Dimensions, Pressable, StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import AppHeader from "@/components/common/AppHeader";
 import Menubar from "@/components/common/menubar";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAuthStore } from "../../store/auth.store";
 
 const MENU_WIDTH = Math.min(340, Math.round(Dimensions.get('window').width * 0.86));
 
@@ -65,6 +66,10 @@ export default function TabLayout() {
   const menuAnim = useRef(new Animated.Value(0)).current;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Get user from auth store
+  const { user } = useAuthStore();
+  const userName = user?.username || 'Alex';
+
   const openMenu = useCallback(() => {
     setIsMenuOpen(true);
     Animated.timing(menuAnim, {
@@ -94,7 +99,7 @@ export default function TabLayout() {
 
   return (
     <>
-      <AppHeader userName="Alex" onMenuPress={openMenu} />
+      <AppHeader userName={userName} onMenuPress={openMenu} />
       <Tabs
         screenOptions={{
           headerShown: false,

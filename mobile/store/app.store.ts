@@ -1,36 +1,45 @@
 import { create } from 'zustand';
+import { useAuthStore } from './auth.store';
 
-export interface User {
+export interface AppUser {
   id: string;
-  name: string;
+  username: string;
   email: string;
 }
 
 interface AppState {
   // State
   isOnline: boolean;
-  user: User | null;
+  user: AppUser | null;
   
   // Actions
   setOnline: (status: boolean) => void;
-  setUser: (user: User | null) => void;
+  syncUserFromAuth: () => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   // Initial state
   isOnline: false,
-  user: {
-    id: 'default-user',
-    name: 'Alex',
-    email: 'alex@example.com',
-  },
+  user: null,
 
   // Actions
   setOnline: (status: boolean) => {
     set({ isOnline: status });
   },
 
-  setUser: (user: User | null) => {
-    set({ user });
+  syncUserFromAuth: () => {
+    const authUser = useAuthStore.getState().user;
+    
+    if (authUser) {
+      set({
+        user: {
+          id: authUser.id,
+          username: authUser.username,
+          email: authUser.email,
+        },
+      });
+    } else {
+      set({ user: null });
+    }
   },
 }));

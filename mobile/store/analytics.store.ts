@@ -1,5 +1,24 @@
 import { create } from 'zustand';
-import analyticsService, { DriftAnalysisResult } from '../services/analytics.service';
+import { lifestyleApi } from '../services/api.service';
+
+export interface DriftAnalysisResult {
+  driftScore: number;
+  riskTrend: 'increasing' | 'stable' | 'decreasing';
+  consistencyScore: number;
+  lifestyleState: 'healthy' | 'moderate' | 'needs_attention' | 'insufficient_data';
+  topContributors: Array<{
+    factor: string;
+    impact: 'high' | 'medium' | 'low';
+    message: string;
+  }>;
+  summary?: {
+    avgSleep: number;
+    avgSteps: number;
+    avgScreenTime: number;
+    daysTracked: number;
+  };
+  message?: string;
+}
 
 interface AnalyticsState {
   // State
@@ -7,16 +26,11 @@ interface AnalyticsState {
   insights: any | null;
   isAnalyzing: boolean;
   error: string | null;
-  backendStatus: boolean;
   lastCheck: Date | null;
-  checkInterval: number | null;
   
   // Actions
-  analyzeDrift: (healthData: any[]) => Promise<void>;
-  generateInsights: (symptoms: any[], healthMetrics: any) => Promise<void>;
-  checkBackend: () => Promise<void>;
-  startBackendMonitoring: (intervalMs?: number) => void;
-  stopBackendMonitoring: () => void;
+  analyzeDrift: (days?: number) => Promise<void>;
+  fetchInsights: () => Promise<void>;
   clearAnalytics: () => void;
   resetError: () => void;
 }
@@ -27,24 +41,25 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
   insights: null,
   isAnalyzing: false,
   error: null,
-  backendStatus: false,
   lastCheck: null,
-  checkInterval: null,
 
   // Actions
-  analyzeDrift: async (healthData: any[]) => {
-    if (!healthData || healthData.length === 0) {
-      set({ error: 'No health data provided for analysis' });
-      return;
-    }
-
+  analyzeDrift: async (days = 30) => {
     set({ isAnalyzing: true, error: null });
     try {
-      const result = await analyticsService.analyzeDrift(healthData);
-      set({ 
-        driftAnalysis: result,
-        isAnalyzing: false 
-      });
+      const response = await lifestyleApi.getAnalysis(days);
+      if (response.success && response.data) {
+        set({ 
+          driftAnalysis: response.data,
+          isAnalyzing: false,
+          lastCheck: new Date()
+        });
+      } else {
+        set({ 
+          error: response.message || 'Analysis failed',
+          isAnalyzing: false 
+        });
+      }
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Analysis failed',
@@ -53,61 +68,32 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
     }
   },
 
-  generateInsights: async (symptoms: any[], healthMetrics: any) => {
+  fetchInsights: async () => {
     set({ isAnalyzing: true, error: null });
     try {
-      const result = await analyticsService.generateInsights(symptoms, healthMetrics);
-      set({ 
-        insights: result,
-        isAnalyzing: false 
-      });
+      // For now, derive insights from drift analysis
+      const driftResponse = await lifestyleApi.getAnalysis(30);
+      if (driftResponse.success && driftResponse.data) {
+        set({ 
+          insights: {
+            driftScore: driftResponse.data.driftScore,
+            lifestyleState: driftResponse.data.lifestyleState,
+            topContributors: driftResponse.data.topContributors,
+          },
+          isAnalyzing: false,
+          lastCheck: new Date()
+        });
+      } else {
+        set({ 
+          error: driftResponse.message || 'Failed to fetch insights',
+          isAnalyzing: false 
+        });
+      }
     } catch (error) {
       set({ 
-        error: error instanceof Error ? error.message : 'Insights generation failed',
+        error: error instanceof Error ? error.message : 'Failed to fetch insights',
         isAnalyzing: false 
       });
-    }
-  },
-
-  checkBackend: async () => {
-    try {
-      const isOnline = await analyticsService.checkBackendStatus();
-      set({ 
-        backendStatus: isOnline,
-        lastCheck: new Date()
-      });
-    } catch (error) {
-      set({ 
-        backendStatus: false,
-        lastCheck: new Date()
-      });
-    }
-  },
-
-  startBackendMonitoring: (intervalMs = 30000) => {
-    const { checkInterval, checkBackend } = get();
-    
-    // Clear existing interval if any
-    if (checkInterval) {
-      clearInterval(checkInterval);
-    }
-    
-    // Initial check
-    checkBackend();
-    
-    // Set up monitoring
-    const interval = setInterval(() => {
-      checkBackend();
-    }, intervalMs) as unknown as number;
-    
-    set({ checkInterval: interval });
-  },
-
-  stopBackendMonitoring: () => {
-    const { checkInterval } = get();
-    if (checkInterval) {
-      clearInterval(checkInterval);
-      set({ checkInterval: null });
     }
   },
 

@@ -1,5 +1,26 @@
 import { create } from 'zustand';
-import insightsService, { PatternInsight, SymptomHistoryItem } from '../services/insights.service';
+import { communityApi } from '../services/api.service';
+import { useAuthStore } from './auth.store';
+
+export interface PatternInsight {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  metric?: string;
+  trend?: 'up' | 'down' | 'stable';
+  severity?: 'info' | 'warning' | 'alert';
+  recommendations?: string[];
+  createdAt: string;
+}
+
+export interface SymptomHistoryItem {
+  id: string;
+  symptom: string;
+  severity: string;
+  timestamp: string;
+  context?: string;
+}
 
 interface InsightsState {
   // State
@@ -12,13 +33,13 @@ interface InsightsState {
   selectedInsight: PatternInsight | null;
   
   // Actions
-  fetchPatternInsights: (userId?: string) => Promise<void>;
-  fetchSymptomHistory: (userId?: string) => Promise<void>;
+  fetchPatternInsights: () => Promise<void>;
+  fetchSymptomHistory: () => Promise<void>;
   fetchCommunityTrends: (category?: string) => Promise<void>;
   selectInsight: (insight: PatternInsight | null) => void;
   clearInsights: () => void;
   resetError: () => void;
-  refreshAll: (userId?: string) => Promise<void>;
+  refreshAll: () => Promise<void>;
 }
 
 export const useInsightsStore = create<InsightsState>((set) => ({
@@ -32,16 +53,32 @@ export const useInsightsStore = create<InsightsState>((set) => ({
   selectedInsight: null,
 
   // Actions
-  fetchPatternInsights: async (userId = 'default-user') => {
+  fetchPatternInsights: async () => {
     set({ isLoading: true, error: null });
     try {
-      const data = await insightsService.getPatternInsights(userId);
-      const insights: PatternInsight[] = Array.isArray(data) ? data : (data as any).data || [];
-      set({ 
-        patternInsights: insights,
-        isLoading: false,
-        lastFetch: new Date()
-      });
+      // Get posts of type 'insight' for pattern insights
+      const response = await communityApi.getFeed({ postType: 'insight' });
+      if (response.success && response.data) {
+        const insights: PatternInsight[] = response.data.map((post: any) => ({
+          id: post._id || post.id,
+          type: 'community_insight',
+          title: post.postType,
+          description: post.content,
+          metric: post.optionalMetrics?.mood,
+          recommendations: [],
+          createdAt: post.createdAt,
+        }));
+        set({ 
+          patternInsights: insights,
+          isLoading: false,
+          lastFetch: new Date()
+        });
+      } else {
+        set({ 
+          error: response.message || 'Failed to fetch insights',
+          isLoading: false 
+        });
+      }
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to fetch insights',
@@ -50,13 +87,13 @@ export const useInsightsStore = create<InsightsState>((set) => ({
     }
   },
 
-  fetchSymptomHistory: async (userId = 'default-user') => {
+  fetchSymptomHistory: async () => {
     set({ isLoading: true, error: null });
     try {
-      const data = await insightsService.getSymptomHistory(userId);
-      const history: SymptomHistoryItem[] = Array.isArray(data) ? data : (data as any).data || [];
+      // This would need a dedicated endpoint in the future
+      // For now, return empty array
       set({ 
-        symptomHistory: history,
+        symptomHistory: [],
         isLoading: false,
         lastFetch: new Date()
       });
@@ -71,13 +108,27 @@ export const useInsightsStore = create<InsightsState>((set) => ({
   fetchCommunityTrends: async (category?: string) => {
     set({ isLoading: true, error: null });
     try {
-      const data = await insightsService.getCommunityTrends(category);
-      const trends: any[] = Array.isArray(data) ? data : (data as any).data || [];
-      set({ 
-        communityTrends: trends,
-        isLoading: false,
-        lastFetch: new Date()
-      });
+      const response = await communityApi.getFeed({ postType: category });
+      if (response.success && response.data) {
+        const trends: any[] = response.data.map((post: any) => ({
+          id: post._id || post.id,
+          content: post.content,
+          type: post.postType,
+          reactions: post.reactions?.length || 0,
+          comments: post.comments?.length || 0,
+          createdAt: post.createdAt,
+        }));
+        set({ 
+          communityTrends: trends,
+          isLoading: false,
+          lastFetch: new Date()
+        });
+      } else {
+        set({ 
+          error: response.message || 'Failed to fetch trends',
+          isLoading: false 
+        });
+      }
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to fetch trends',
@@ -105,27 +156,42 @@ export const useInsightsStore = create<InsightsState>((set) => ({
     set({ error: null });
   },
 
-  refreshAll: async (userId = 'default-user') => {
+  refreshAll: async () => {
     set({ isLoading: true, error: null });
     try {
-      const [patternData, historyData, trendsData] = await Promise.all([
-        insightsService.getPatternInsights(userId),
-        insightsService.getSymptomHistory(userId),
-        insightsService.getCommunityTrends()
+      const [postsResponse] = await Promise.all([
+        communityApi.getFeed({}),
       ]);
       
-      set({ 
-        patternInsights: Array.isArray(patternData) ? patternData : (patternData as any).data || [],
-        symptomHistory: Array.isArray(historyData) ? historyData : (historyData as any).data || [],
-        communityTrends: Array.isArray(trendsData) ? trendsData : (trendsData as any).data || [],
-        isLoading: false,
-        lastFetch: new Date()
-      });
+      if (postsResponse.success && postsResponse.data) {
+        const insights: PatternInsight[] = postsResponse.data
+          .filter((post: any) => post.postType === 'insight')
+          .map((post: any) => ({
+            id: post._id || post.id,
+            type: 'community_insight',
+            title: post.postType,
+            description: post.content,
+            metric: post.optionalMetrics?.mood,
+            recommendations: [],
+            createdAt: post.createdAt,
+          }));
+
+        set({ 
+          patternInsights: insights,
+          isLoading: false,
+          lastFetch: new Date()
+        });
+      } else {
+        set({ 
+          error: postsResponse.message || 'Failed to refresh data',
+          isLoading: false 
+        });
+      }
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to refresh data',
         isLoading: false 
       });
     }
-  }
+  },
 }));

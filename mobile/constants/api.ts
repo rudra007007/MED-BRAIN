@@ -1,40 +1,25 @@
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
-
-const resolveHost = () => {
-  const hostUri = Constants.expoConfig?.hostUri ?? (Constants as any).manifest?.hostUri ?? '';
-  const host = hostUri.split(':')[0];
-
-  if (host) {
-    return host;
-  }
-
-  return Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
-};
-
-export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || `http://${resolveHost()}:3000/api`;
+// API Configuration
+// Update this to your backend URL in production
+export const API_BASE_URL = 'http://10.180.39.138:5000/api';
 
 export const API_ENDPOINTS = {
-  // Symptom endpoints
-  EXTRACT_SYMPTOMS: `${API_BASE_URL}/symptoms/extract`,
-  SYMPTOM_RELATIONSHIPS: `${API_BASE_URL}/symptoms/relationships`,
+  // Auth
+  signup: `${API_BASE_URL}/auth/signup`,
+  login: `${API_BASE_URL}/auth/login`,
+  logout: `${API_BASE_URL}/auth/logout`,
+  getMe: `${API_BASE_URL}/auth/me`,
 
-  // Health data endpoints
-  HEALTH_DATA: `${API_BASE_URL}/health/data`,
+  // User
+  profile: `${API_BASE_URL}/user/profile`,
+  onboarding: `${API_BASE_URL}/user/onboarding`,
+  preferences: `${API_BASE_URL}/user/preferences`,
 
-  // Analytics endpoints
-  DRIFT_ANALYSIS: `${API_BASE_URL}/analytics/drift`,
-  INSIGHTS: `${API_BASE_URL}/analytics/insights`,
+  // Lifestyle
+  lifestyle: `${API_BASE_URL}/lifestyle`,
+  lifestyleAnalysis: `${API_BASE_URL}/lifestyle/analysis`,
 
-  // Insights endpoints
-  PATTERN_INSIGHTS: `${API_BASE_URL}/insights`,
-  SYMPTOM_HISTORY: `${API_BASE_URL}/insights/symptom-history`,
-
-  // Community endpoints
-  COMMUNITY_TRENDS: `${API_BASE_URL}/community/trends`,
-  COMMUNITY_POSTS: `${API_BASE_URL}/community/posts`,
-
-  // Status
-  STATUS: `${API_BASE_URL}/status`,
+  // Community
+  communityFeed: `${API_BASE_URL}/community/posts`,
+  createPost: `${API_BASE_URL}/community/posts`,
+  myPosts: `${API_BASE_URL}/community/my-posts`,
 };
