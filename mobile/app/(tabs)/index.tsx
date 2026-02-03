@@ -87,6 +87,7 @@ export default function HomeScreen() {
                 if (signal.type === 'sleep') router.push('/sleep-intelligence');
                 else if (signal.type === 'activity') router.push('/activity-detail');
                 else if (signal.type === 'recovery') router.push('/recovery-signal');
+                else if (signal.type === 'screen') router.push('/screen-time');
               }}
               style={styles.signalCardWrapper}
               activeOpacity={0.75}

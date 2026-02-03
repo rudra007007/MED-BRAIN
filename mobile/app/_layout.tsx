@@ -27,6 +27,7 @@ function RootLayoutNav() {
       <Stack.Screen name="details/activity-detail" options={{ headerShown: false }} />
       <Stack.Screen name="details/recovery-signal" options={{ headerShown: false }} />
       <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen name="screen-time" options={{ headerShown: false }} />
       <Stack.Screen name="menu" options={{ headerShown: false, headerLeft: undefined, }} />
     </Stack>
   );

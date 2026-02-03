@@ -132,6 +132,7 @@ export default function TabLayout() {
             headerShown: false,
           }}
         />
+
       </Tabs>
 
       <View style={StyleSheet.absoluteFill} pointerEvents={isMenuOpen ? "auto" : "none"}>
