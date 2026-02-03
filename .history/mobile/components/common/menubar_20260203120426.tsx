@@ -36,7 +36,6 @@ export default function Menubar({ onClose }: MenubarProps) {
   const { theme, setTheme } = useTheme();
 
   const [activeSettingsCategory, setActiveSettingsCategory] = useState<SettingsCategory>(null);
-  const [showThemeDropdown, setShowThemeDropdown] = useState(false);
 
   const errorColor = colors.statusError || '#FF3B30';
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -546,40 +545,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     fontStyle: 'italic',
-  },
-  dropdown: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  dropdownTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-  },
-  dropdownValue: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 12,
-  },
-  dropdownItems: {
-    borderTopWidth: 1,
-    borderTopColor: 'transparent',
-  },
-  dropdownItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 14,
-    paddingLeft: 16,
-    borderBottomWidth: 1,
-  },
-  dropdownItemText: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '500',
-    marginLeft: 12,
   },
   contentCard: {
     padding: 16,
