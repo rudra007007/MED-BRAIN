@@ -294,48 +294,6 @@ export default function Menubar({ onClose }: MenubarProps) {
     </View>
   );
 
-  // ------------------- PRIVACY & TERMS PAGE -------------------
-  const renderLegalSettings = () => (
-    <View style={styles.settingsDetailContainer}>
-      <View style={styles.detailHeader}>
-        <TouchableOpacity onPress={handleSettingsBack} style={styles.backButton}>
-          <ChevronLeft size={24} color={colors.accent} />
-          <Text style={[styles.backButtonText, { color: colors.accent }]}>Back</Text>
-        </TouchableOpacity>
-        <Text style={[styles.detailTitle, { color: colors.text }]}>Privacy & Terms</Text>
-      </View>
-
-      <Text style={[styles.subsectionTitle, { color: colors.text }]}>Terms & Conditions</Text>
-      <View style={[styles.contentCard, { backgroundColor: colors.backgroundCard }]}>
-        <Text style={[styles.contentText, { color: colors.text }]}>
-          By using MED-BRAIN, you agree to these terms and conditions. MED-BRAIN is a health intelligence platform that provides personalized health insights based on your data.
-        </Text>
-        <Text style={[styles.contentText, { color: colors.textSecondary }]}>
-          We are not a medical device and do not provide medical advice. Always consult with healthcare professionals for medical decisions.
-        </Text>
-        <Text style={[styles.contentText, { color: colors.textSecondary }]}>
-          Your use of the app is subject to these terms, and we reserve the right to update them as needed.
-        </Text>
-      </View>
-
-      <Text style={[styles.subsectionTitle, { color: colors.text }]}>Privacy Policy</Text>
-      <View style={[styles.contentCard, { backgroundColor: colors.backgroundCard }]}>
-        <Text style={[styles.contentText, { color: colors.text }]}>
-          We take your privacy seriously. MED-BRAIN collects health-related data to provide personalized insights and recommendations.
-        </Text>
-        <Text style={[styles.contentText, { color: colors.textSecondary }]}>
-          Your data is encrypted and stored securely. We do not sell your personal information to third parties.
-        </Text>
-        <Text style={[styles.contentText, { color: colors.textSecondary }]}>
-          You can request to delete your data at any time through the Account Actions section in Settings.
-        </Text>
-        <Text style={[styles.contentText, { color: colors.textSecondary }]}>
-          We use your data only to improve our services and provide you with better health insights.
-        </Text>
-      </View>
-    </View>
-  );
-
   // ------------------- ACCOUNT ACTIONS SETTINGS -------------------
   const renderAccountSettings = () => (
     <View style={styles.settingsDetailContainer}>
@@ -377,7 +335,6 @@ export default function Menubar({ onClose }: MenubarProps) {
           {activeSettingsCategory === 'preferences' && renderPreferencesSettings()}
           {activeSettingsCategory === 'about' && renderAboutSettings()}
           {activeSettingsCategory === 'account' && renderAccountSettings()}
-          {activeSettingsCategory === 'legal' && renderLegalSettings()}
           
           {/* Main settings list */}
           {activeSettingsCategory === null && renderSettingsMainList()}
@@ -521,15 +478,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     fontStyle: 'italic',
-  },
-  contentCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  contentText: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
   },
 });

@@ -522,14 +522,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontStyle: 'italic',
   },
-  contentCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  contentText: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
 });
