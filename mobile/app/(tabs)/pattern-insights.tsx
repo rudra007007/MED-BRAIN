@@ -13,10 +13,182 @@ import {
   Heart,
   Users,
   X,
-  Zap
+  Zap,
+  Check,
+  ChevronDown
 } from 'lucide-react-native';
 import ChartScrubber from '../../components/ui/ChartScrubber';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import Animated, { FadeInDown, LayoutAnimationConfig } from 'react-native-reanimated';
+
+type CalendarDay = {
+  day: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  date: Date;
+};
+
+function getCalendarDays(): CalendarDay[] {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  const days: CalendarDay[] = [];
+  const paddingBefore = firstDay.getDay();
+
+  // Previous month padding
+  for (let i = paddingBefore - 1; i >= 0; i--) {
+    const d = new Date(year, month, -i);
+    days.push({ day: d.getDate(), isCurrentMonth: false, isToday: false, date: d });
+  }
+
+  // Current month
+  for (let i = 1; i <= lastDay.getDate(); i++) {
+    const d = new Date(year, month, i);
+    const isToday = i === now.getDate();
+    days.push({ day: i, isCurrentMonth: true, isToday, date: d });
+  }
+
+  return days;
+}
+
+function CalendarDropdown({
+  isVisible,
+  onClose,
+  textColor,
+  subTextColor,
+  accentColor,
+  cardColor,
+  borderColor
+}: {
+  isVisible: boolean;
+  onClose: () => void;
+  textColor: string;
+  subTextColor: string;
+  accentColor: string;
+  cardColor: string;
+  borderColor: string;
+}) {
+  const days = getCalendarDays();
+  const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const monthName = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  if (!isVisible) return null;
+
+  return (
+    <Animated.View
+      entering={FadeInDown.springify().damping(15)}
+      style={[styles.calendarContainer, { backgroundColor: cardColor, borderColor }]}
+    >
+      <View style={styles.calendarHeader}>
+        <Text style={[styles.calendarMonthTitle, { color: textColor }]}>{monthName}</Text>
+      </View>
+
+      <View style={styles.calendarGrid}>
+        <View style={styles.calendarWeekRow}>
+          {weekDays.map((d, i) => (
+            <Text key={i} style={[styles.calendarWeekLabel, { color: subTextColor }]}>{d}</Text>
+          ))}
+        </View>
+        <View style={styles.calendarDaysGrid}>
+          {days.map((day, index) => (
+            <TouchableOpacity key={index} style={styles.calendarDayCell} activeOpacity={0.7}>
+              <View style={[
+                styles.calendarDayCircle,
+                day.isToday && { backgroundColor: accentColor }
+              ]}>
+                <Text style={[
+                  styles.calendarDayText,
+                  {
+                    color: day.isToday ? '#000' : (day.isCurrentMonth ? textColor : subTextColor),
+                    opacity: day.isCurrentMonth ? 1 : 0.3,
+                    fontWeight: day.isToday ? '700' : '400'
+                  }
+                ]}>
+                  {day.day}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
+function WeeklyStreakStrip({
+  textColor,
+  subTextColor,
+  accentColor,
+  cardColor,
+  onToggleCalendar,
+  isCalendarOpen
+}: {
+  textColor: string;
+  subTextColor: string;
+  accentColor: string;
+  cardColor: string;
+  onToggleCalendar: () => void;
+  isCalendarOpen: boolean;
+}) {
+  const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const todayIndex = 2; // Tuesday based on image
+
+  return (
+    <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.streakContainer}>
+      <View style={styles.streakHeader}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onToggleCalendar}
+          style={styles.streakTitleRow}
+        >
+          <Text style={[styles.streakTitle, { color: textColor }]}>Today</Text>
+          <Animated.View style={{ transform: [{ rotate: isCalendarOpen ? '180deg' : '0deg' }] }}>
+            <ChevronDown size={24} color={textColor} />
+          </Animated.View>
+        </TouchableOpacity>
+
+        <View style={styles.streakCountBadge}>
+          <Text style={[styles.streakCount, { color: textColor }]}>3</Text>
+          <Zap size={14} color={textColor} fill={textColor} />
+        </View>
+      </View>
+
+      <View style={styles.weekRow}>
+        {days.map((day, index) => {
+          const isPast = index <= todayIndex;
+          const isToday = index === todayIndex;
+
+          return (
+            <View key={index} style={styles.dayColumn}>
+              <Text style={[styles.dayLabel, { color: subTextColor, opacity: isToday ? 1 : 0.6 }]}>{day}</Text>
+              <View style={[
+                styles.dayCircle,
+                {
+                  backgroundColor: isPast ? (isToday ? textColor : 'transparent') : 'transparent',
+                  borderColor: isPast ? textColor : subTextColor,
+                  borderWidth: isPast ? 0 : 1.5,
+                  opacity: isPast ? 1 : 0.3
+                }
+              ]}>
+                {isPast && (
+                  <Check
+                    size={12}
+                    color={isToday ? cardColor : textColor}
+                    strokeWidth={4}
+                  />
+                )}
+              </View>
+            </View>
+          );
+        })}
+      </View>
+    </Animated.View>
+  );
+}
 
 type ChartSection = {
   id: string;
@@ -35,6 +207,7 @@ type ChartSection = {
 
 export default function PatternInsightsScreen() {
   const [infoModalVisible, setInfoModalVisible] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Theme Hooks
   const backgroundColor = useThemeColor({}, 'background');
@@ -44,6 +217,7 @@ export default function PatternInsightsScreen() {
   const borderColor = useThemeColor({}, 'border');
   const iconColor = useThemeColor({}, 'tint');
   const statusBadgeBg = useThemeColor({}, 'backgroundAccent');
+  const accentColor = useThemeColor({}, 'accent');
 
   const chartSections: ChartSection[] = [
     {
@@ -89,8 +263,32 @@ export default function PatternInsightsScreen() {
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+
+        <WeeklyStreakStrip
+          textColor={textColor}
+          subTextColor={subTextColor}
+          accentColor={accentColor}
+          cardColor={cardColor}
+          isCalendarOpen={isCalendarOpen}
+          onToggleCalendar={() => setIsCalendarOpen(!isCalendarOpen)}
+        />
+
+        <CalendarDropdown
+          isVisible={isCalendarOpen}
+          onClose={() => setIsCalendarOpen(false)}
+          textColor={textColor}
+          subTextColor={subTextColor}
+          accentColor={accentColor}
+          cardColor={cardColor}
+          borderColor={borderColor}
+        />
+
+        <View style={{ height: 24 }} />
+
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: textColor }]}>30-Day Relative Trends</Text>
+          <Text style={[styles.sectionTitle, { color: textColor }]}>
+            Trend Analysis
+          </Text>
           <Text style={[styles.sectionDescription, { color: subTextColor }]}>
             Comparison of biological signals against baseline. Scrub the charts to see precise daily variance.
           </Text>
@@ -207,6 +405,106 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
     paddingBottom: 100
+  },
+  streakContainer: {
+    marginBottom: 8,
+  },
+  streakHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  streakTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  streakTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  streakCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  streakCount: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  weekRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  dayColumn: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  dayLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  dayCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calendarContainer: {
+    marginTop: 8,
+    borderRadius: 24,
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 16,
+    overflow: 'hidden'
+  },
+  calendarHeader: {
+    alignItems: 'center',
+    marginBottom: 16
+  },
+  calendarMonthTitle: {
+    fontSize: 16,
+    fontWeight: '700'
+  },
+  calendarGrid: {
+    gap: 12
+  },
+  calendarWeekRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8
+  },
+  calendarWeekLabel: {
+    width: 32,
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    opacity: 0.7
+  },
+  calendarDaysGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 12
+  },
+  calendarDayCell: {
+    width: '14.28%', // 100/7
+    alignItems: 'center'
+  },
+  calendarDayCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  calendarDayText: {
+    fontSize: 13
   },
   sectionHeader: {
     marginBottom: 24

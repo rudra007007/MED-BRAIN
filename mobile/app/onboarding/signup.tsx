@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,17 +11,22 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, Eye, EyeOff, Shield, Info } from 'lucide-react-native';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function SignUpScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  // Zustand store
+  const { signup, isLoading, error, isAuthenticated, clearError, checkAuth } = useAuthStore();
 
   const getPasswordStrength = () => {
     if (password.length === 0) return 0;
     if (password.length < 8) return 1;
+    if (password.match(/[a-z]/) && password.match(/[0-9]/) && password.length >= 10) return 4;
     if (password.match(/[a-z]/) && password.match(/[0-9]/)) return 3;
     if (password.match(/[a-z]/) || password.match(/[0-9]/)) return 2;
     return 1;
@@ -29,16 +34,35 @@ export default function SignUpScreen() {
 
   const passwordStrength = getPasswordStrength();
 
+  // Check auth on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // Navigate if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/onboarding/personalize');
+    }
+  }, [isAuthenticated]);
+
   const handleContinue = async () => {
-    if (!email || !password || password.length < 8 || !password.match(/[0-9]/)) {
+    if (!email || !password || !username) return;
+
+    if (password.length < 8) {
       return;
     }
-    
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    if (!password.match(/[0-9]/)) {
+      return;
+    }
+
+    try {
+      await signup(email, password, username);
       router.push('/onboarding/personalize');
-    }, 1500);
+    } catch {
+      // Error is handled by the store
+    }
   };
 
   return (
@@ -66,7 +90,29 @@ export default function SignUpScreen() {
           <Text style={styles.subheading}>Start your AI-powered health journey today.</Text>
         </View>
 
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
         <View style={styles.formSection}>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Choose a username"
+              placeholderTextColor="#9db4b9"
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+                clearError();
+              }}
+              editable={!isLoading}
+              autoCapitalize="none"
+            />
+          </View>
+
           <View style={styles.formGroup}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -74,9 +120,13 @@ export default function SignUpScreen() {
               placeholder="Enter your email"
               placeholderTextColor="#9db4b9"
               value={email}
-              onChangeText={setEmail}
-              editable={!loading}
+              onChangeText={(text) => {
+                setEmail(text);
+                clearError();
+              }}
+              editable={!isLoading}
               keyboardType="email-address"
+              autoCapitalize="none"
             />
           </View>
 
@@ -88,14 +138,17 @@ export default function SignUpScreen() {
                 placeholder="Create a secure password"
                 placeholderTextColor="#9db4b9"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  clearError();
+                }}
                 secureTextEntry={!showPassword}
-                editable={!loading}
+                editable={!isLoading}
               />
               <TouchableOpacity 
                 style={styles.visibilityButton}
                 onPress={() => setShowPassword(!showPassword)}
-                disabled={loading}
+                disabled={isLoading}
               >
                 {showPassword ? (
                   <Eye size={20} color="#9db4b9" />
@@ -129,11 +182,11 @@ export default function SignUpScreen() {
         </View>
 
         <TouchableOpacity 
-          style={[styles.continueButton, loading && styles.continueButtonDisabled]}
+          style={[styles.continueButton, isLoading && styles.continueButtonDisabled]}
           onPress={handleContinue}
-          disabled={loading || !email || !password || password.length < 8 || !password.match(/[0-9]/)}
+          disabled={isLoading}
         >
-          {loading ? (
+          {isLoading ? (
             <ActivityIndicator color="#101f22" size="small" />
           ) : (
             <Text style={styles.continueButtonText}>Continue</Text>
@@ -142,7 +195,7 @@ export default function SignUpScreen() {
 
         <View style={styles.signInContainer}>
           <Text style={styles.signInText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.back()} disabled={loading}>
+          <TouchableOpacity onPress={() => router.back()} disabled={isLoading}>
             <Text style={styles.signInLink}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -215,6 +268,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#9db4b9',
     lineHeight: 22
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 0, 0, 0.3)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16
+  },
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 14
   },
   formSection: {
     gap: 16,

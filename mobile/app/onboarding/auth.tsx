@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -12,12 +12,15 @@ import {
 import { Stack, useRouter } from 'expo-router';
 import { Apple } from 'lucide-react-native';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function AuthScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  // Zustand store
+  const { login, isLoading, error, isAuthenticated, clearError, checkAuth } = useAuthStore();
 
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
@@ -28,14 +31,26 @@ export default function AuthScreen() {
   const inputBg = useThemeColor({}, 'backgroundAccent');
   const logoBg = 'rgba(19, 200, 236, 0.1)';
 
-  const handleSignIn = async () => {
-    setLoading(true);
-    // Simulate authentication delay
-    setTimeout(() => {
-      setLoading(false);
-      // Navigate back to home after sign in
+  // Check auth on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // Navigate if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
       router.replace('/(tabs)');
-    }, 1500);
+    }
+  }, [isAuthenticated]);
+
+  const handleSignIn = async () => {
+    if (!email || !password) return;
+
+    try {
+      await login(email, password);
+    } catch {
+      // Error is handled by the store
+    }
   };
 
   return (
@@ -54,6 +69,12 @@ export default function AuthScreen() {
           <Text style={[styles.title, { color: textColor }]}>Your Health Intelligence, Secured.</Text>
           <Text style={[styles.subtitle, { color: subTextColor }]}>Access personalized insights and community trends.</Text>
         </View>
+
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.authSection}>
           <TouchableOpacity style={[styles.socialButton, { backgroundColor: cardColor, borderColor }]}>
@@ -80,15 +101,20 @@ export default function AuthScreen() {
                 placeholder="name@example.com"
                 placeholderTextColor={subTextColor}
                 value={email}
-                onChangeText={setEmail}
-                editable={!loading}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  clearError();
+                }}
+                editable={!isLoading}
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
             </View>
 
             <View style={styles.inputGroup}>
               <View style={styles.passwordLabelContainer}>
                 <Text style={[styles.inputLabel, { color: subTextColor }]}>Password</Text>
-                <TouchableOpacity disabled={loading}>
+                <TouchableOpacity disabled={isLoading}>
                   <Text style={styles.forgotButton}>Forgot?</Text>
                 </TouchableOpacity>
               </View>
@@ -97,18 +123,21 @@ export default function AuthScreen() {
                 placeholder="••••••••"
                 placeholderTextColor={subTextColor}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  clearError();
+                }}
                 secureTextEntry
-                editable={!loading}
+                editable={!isLoading}
               />
             </View>
 
             <TouchableOpacity
-              style={[styles.signInButton, loading && styles.signInButtonDisabled]}
+              style={[styles.signInButton, isLoading && styles.signInButtonDisabled]}
               onPress={handleSignIn}
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? (
+              {isLoading ? (
                 <ActivityIndicator color="#101f22" size="small" />
               ) : (
                 <Text style={styles.signInButtonText}>Sign In</Text>
@@ -116,8 +145,8 @@ export default function AuthScreen() {
             </TouchableOpacity>
 
             <View style={styles.signUpContainer}>
-              <Text style={[styles.signUpText, { color: subTextColor }]}>Don't have an account? </Text>
-              <TouchableOpacity onPress={() => router.push('/onboarding/signup')} disabled={loading}>
+              <Text style={[styles.signUpText, { color: subTextColor }]}>{'Don\'t have an account? '}</Text>
+              <TouchableOpacity onPress={() => router.push('/onboarding/signup')} disabled={isLoading}>
                 <Text style={styles.signUpLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
@@ -182,6 +211,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 0, 0, 0.3)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16
+  },
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 14
   },
   authSection: {
     marginBottom: 40

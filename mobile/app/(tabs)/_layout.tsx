@@ -5,12 +5,17 @@ import { Animated, Dimensions, Pressable, StyleSheet, View } from "react-native"
 import AppHeader from "@/components/common/AppHeader";
 import Menubar from "@/components/common/menubar";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAuthStore } from "../../store/auth.store";
 
 const MENU_WIDTH = Math.min(340, Math.round(Dimensions.get('window').width * 0.86));
 
 export default function TabLayout() {
   const menuAnim = useRef(new Animated.Value(0)).current;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Get user from auth store
+  const { user } = useAuthStore();
+  const userName = user?.username || 'Alex';
 
   const openMenu = useCallback(() => {
     setIsMenuOpen(true);
@@ -46,7 +51,7 @@ export default function TabLayout() {
 
   return (
     <>
-      <AppHeader userName="Alex" onMenuPress={openMenu} />
+      <AppHeader userName={userName} onMenuPress={openMenu} />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: activeColor,

@@ -1,31 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, LogOut, Sun, Moon, Smartphone } from 'lucide-react-native';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  
+  // Auth store
+  const { user, logout, isLoading } = useAuthStore();
 
   // Theme colors
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const subTextColor = useThemeColor({}, 'textSecondary');
-  const sectionTitleColor = useThemeColor({}, 'textSecondary'); // or textTertiary
-  const itemBg = useThemeColor({}, 'backgroundAccent'); // or backgroundCard
+  const sectionTitleColor = useThemeColor({}, 'textSecondary');
+  const itemBg = useThemeColor({}, 'backgroundAccent');
   const borderColor = useThemeColor({}, 'border');
-  const iconColor = useThemeColor({}, 'tint');
 
-  const handleSignOut = () => {
+  // Get first letter for avatar
+  const avatarLetter = user?.username ? user.username.charAt(0).toUpperCase() : 'A';
+  const displayName = user?.username || 'Alex';
+  const displayEmail = user?.email || 'alex@example.com';
+
+  const handleSignOut = async () => {
+    await logout();
     router.replace('/onboarding/auth');
   };
 
@@ -44,10 +54,10 @@ export default function ProfileScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={[styles.profileSection, { borderBottomColor: borderColor }]}>
           <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>A</Text>
+            <Text style={styles.avatarText}>{avatarLetter}</Text>
           </View>
-          <Text style={[styles.profileName, { color: textColor }]}>Alex Johnson</Text>
-          <Text style={[styles.profileEmail, { color: subTextColor }]}>alex@example.com</Text>
+          <Text style={[styles.profileName, { color: textColor }]}>{displayName}</Text>
+          <Text style={[styles.profileEmail, { color: subTextColor }]}>{displayEmail}</Text>
         </View>
 
         {/* App Preferences Section */}
@@ -92,41 +102,51 @@ export default function ProfileScreen() {
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>Account Settings</Text>
-          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
+          <View style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
               <Text style={[styles.cardLabel, { color: textColor }]}>Email Address</Text>
-              <Text style={[styles.cardValue, { color: subTextColor }]}>alex@example.com</Text>
+              <Text style={[styles.cardValue, { color: subTextColor }]}>{displayEmail}</Text>
             </View>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
+          <View style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
-              <Text style={[styles.cardLabel, { color: textColor }]}>Phone Number</Text>
-              <Text style={[styles.cardValue, { color: subTextColor }]}>+1 (555) 123-4567</Text>
+              <Text style={[styles.cardLabel, { color: textColor }]}>Username</Text>
+              <Text style={[styles.cardValue, { color: subTextColor }]}>{displayName}</Text>
             </View>
-          </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>Health Preferences</Text>
-          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
+          <View style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
               <Text style={[styles.cardLabel, { color: textColor }]}>Notification Frequency</Text>
               <Text style={[styles.cardValue, { color: subTextColor }]}>Daily</Text>
             </View>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
+          <View style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
               <Text style={[styles.cardLabel, { color: textColor }]}>Data Sharing</Text>
               <Text style={[styles.cardValue, { color: subTextColor }]}>Enabled</Text>
             </View>
-          </TouchableOpacity>
+          </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-          <LogOut size={18} color="#FF3B30" />
-          <Text style={styles.logoutButtonText}>Sign Out</Text>
+        <TouchableOpacity 
+          style={styles.logoutButton} 
+          onPress={handleSignOut}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#FF3B30" size="small" />
+          ) : (
+            <>
+              <LogOut size={18} color="#FF3B30" />
+              <Text style={styles.logoutButtonText}>Sign Out</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <View style={styles.bottomSpacing} />

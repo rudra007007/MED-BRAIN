@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Activity as ActivityIcon, Heart, Lightbulb, Smartphone, TrendingUp, ArrowRight } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -8,6 +8,8 @@ import type { HealthSignal } from '../../types/health';
 import { useAnalyticsStore } from '../../store/analytics.store';
 import { useHealthStore } from '../../store/health.store';
 import { useInsightsStore } from '../../store/insights.store';
+import { useAppStore } from '../../store/app.store';
+import { useAuthStore } from '../../store/auth.store';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 import LifestyleTrajectoryRing from '@/components/ui/LifestyleTrajectoryRing';
@@ -16,15 +18,31 @@ export default function HomeScreen() {
   const router = useRouter();
   const { colorScheme } = useTheme();
   const colors = Colors[colorScheme ?? 'light'];
-  const { checkBackend } = useAnalyticsStore();
+
+  // Get user from auth store
+  const { user } = useAuthStore();
+  const { syncUserFromAuth } = useAppStore();
+
+  // Analytics store - no checkBackend, just analyzeDrift
+  const { driftAnalysis, analyzeDrift } = useAnalyticsStore();
+  
+  // Health store
   const { fetchHealthData } = useHealthStore();
+  
+  // Insights store
   const { patternInsights, fetchPatternInsights } = useInsightsStore();
 
+  // Sync user on mount
   useEffect(() => {
-    checkBackend();
+    syncUserFromAuth();
+  }, [syncUserFromAuth]);
+
+  // Fetch data on mount
+  useEffect(() => {
     fetchHealthData();
     fetchPatternInsights();
-  }, [checkBackend, fetchHealthData, fetchPatternInsights]);
+    analyzeDrift();
+  }, []);
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -48,25 +66,37 @@ export default function HomeScreen() {
     }
   };
 
+  // Use backend data or fallback to mock data
+  const userName = user?.username || 'Alex';
+  const statusMessage = driftAnalysis?.lifestyleState 
+    ? driftAnalysis.lifestyleState.replace(/_/g, ' ').toUpperCase()
+    : riskDriftData.message;
 
+  const lifestyleDrift = driftAnalysis?.driftScore 
+    ? Math.max(20, 100 - driftAnalysis.driftScore) 
+    : lifestyleTrajectoryRing.lifestyleDrift;
 
-  // ... imports
+  const riskTrajectory = driftAnalysis?.riskTrend === 'decreasing' 
+    ? 75 
+    : driftAnalysis?.riskTrend === 'increasing' 
+      ? 40 
+      : lifestyleTrajectoryRing.riskTrajectory;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.greetingSection}>
-          <Text style={[styles.greeting, { color: colors.text }]}>{getTimeGreeting()}, Alex</Text>
+          <Text style={[styles.greeting, { color: colors.text }]}>{getTimeGreeting()}, {userName}</Text>
           <View style={[styles.statusBadge, { backgroundColor: colors.backgroundCard }]}>
             <View style={[styles.statusDot, { backgroundColor: colors.statusSuccess }]} />
-            <Text style={[styles.statusText, { color: colors.text }]}>{riskDriftData.message}</Text>
+            <Text style={[styles.statusText, { color: colors.text }]}>{statusMessage}</Text>
           </View>
         </View>
 
         <LifestyleTrajectoryRing
-          lifestyleDrift={lifestyleTrajectoryRing.lifestyleDrift}
-          riskTrajectory={lifestyleTrajectoryRing.riskTrajectory}
+          lifestyleDrift={lifestyleDrift}
+          riskTrajectory={riskTrajectory}
           routineConsistency={lifestyleTrajectoryRing.routineConsistency}
           onPress={() => router.push('/pattern-insights')}
         />
@@ -79,7 +109,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.signalsGrid}>
-          {currentHealthSignals.map((signal: HealthSignal, index: number) => (
+          {currentHealthSignals.map((signal: HealthSignal) => (
             <TouchableOpacity
               key={signal.id}
               onPress={() => {
@@ -119,7 +149,8 @@ export default function HomeScreen() {
             <Text style={[styles.viewAllLink, { color: colors.accent }]}>View All</Text>
           </TouchableOpacity>
         </View>
-        {patternInsights.length > 0 && (
+        
+        {patternInsights.length > 0 ? (
           <TouchableOpacity
             style={[styles.insightCardWrapper, { backgroundColor: colors.backgroundCard }]}
             activeOpacity={0.85}
@@ -131,12 +162,6 @@ export default function HomeScreen() {
             <View style={styles.insightContent}>
               <View style={styles.insightHeader}>
                 <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>LATEST PATTERN</Text>
-                {patternInsights[0].riskChange && (
-                  <View style={[styles.riskBadge, { backgroundColor: 'rgba(255, 59, 48, 0.1)' }]}>
-                    <TrendingUp size={12} color="#FF3B30" />
-                    <Text style={styles.riskText}>+{patternInsights[0].riskChange}%</Text>
-                  </View>
-                )}
               </View>
               <Text style={[styles.insightTitle, { color: colors.text }]}>{patternInsights[0].title}</Text>
               <Text style={[styles.insightDescription, { color: colors.textSecondary }]} numberOfLines={2}>
@@ -145,6 +170,19 @@ export default function HomeScreen() {
             </View>
             <ArrowRight size={18} color={colors.textSecondary} style={styles.insightArrow} />
           </TouchableOpacity>
+        ) : (
+          <View style={[styles.insightCardWrapper, { backgroundColor: colors.backgroundCard }]}>
+            <View style={[styles.insightIconGradient, { backgroundColor: colorScheme === 'dark' ? 'rgba(255, 193, 7, 0.15)' : 'rgba(255, 193, 7, 0.1)' }]}>
+              <Lightbulb size={22} color="#FFC107" fill="#FFC107" />
+            </View>
+            <View style={styles.insightContent}>
+              <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>PATTERN DETECTED</Text>
+              <Text style={[styles.insightTitle, { color: colors.text }]}>No patterns yet</Text>
+              <Text style={[styles.insightDescription, { color: colors.textSecondary }]}>
+                Start tracking your lifestyle to discover patterns.
+              </Text>
+            </View>
+          </View>
         )}
 
         <View style={[styles.quickTipCard, { backgroundColor: colors.backgroundCard }]}>
@@ -171,52 +209,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    marginBottom: 24
-  },
-  profilePic: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FFE4D6',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  profileText: {
-    fontSize: 18,
-    fontWeight: '600'
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    flex: 1,
-    textAlign: 'center'
-  },
-  logoContainer: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative'
-  },
-  statusDot: {
-    position: 'absolute',
-    top: 2,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#8E8E93',
-    borderWidth: 2,
-    borderColor: '#F2F2F7'
-  },
-  statusDotActive: {
-    backgroundColor: '#34C759'
-  },
   greetingSection: {
     marginBottom: 28,
     marginTop: 8,
@@ -241,6 +233,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 20,
   },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#34C759',
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -250,7 +248,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1C1C1E',
     marginBottom: 1
   },
   historyLink: {
@@ -343,19 +340,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     opacity: 0.7,
-  },
-  riskBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  riskText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FF3B30',
   },
   insightTitle: {
     fontSize: 19,
