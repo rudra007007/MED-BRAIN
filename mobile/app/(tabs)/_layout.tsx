@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, TrendingUp, Users, BarChart3 } from "lucide-react-native";
+import { Home, TrendingUp, Users, BarChart3, Bell } from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
 import { Animated, Dimensions, Pressable, StyleSheet, View } from "react-native";
 import AppHeader from "@/components/common/AppHeader";
@@ -84,10 +84,10 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="ViewAnalysisScreen"
+          name="pattern-insights"
           options={{
-            title: "Analysis",
-            tabBarIcon: ({ color }) => <BarChart3 size={24} color={color} />,
+            title: "Insights",
+            tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -98,10 +98,17 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="pattern-insights"
+          name="ViewAnalysisScreen"
           options={{
-            title: "Insights",
-            tabBarIcon: ({ color }) => <TrendingUp size={24} color={color} />,
+            title: "Analysis",
+            tabBarIcon: ({ color }) => <BarChart3 size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="notification"
+          options={{
+            title: "Updates",
+            tabBarIcon: ({ color }) => <Bell size={24} color={color} />,
           }}
         />
         <Tabs.Screen
