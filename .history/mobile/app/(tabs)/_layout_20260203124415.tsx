@@ -13,12 +13,12 @@ function FloatingTabBar() {
   const router = useRouter();
   const pathname = usePathname();
   const accentColor = useThemeColor({}, 'accent');
-
+  
   const tabs = [
     { name: 'index', path: '/', icon: Home, label: 'Home' },
-    { name: 'pattern-insights', path: '/pattern-insights', icon: TrendingUp, label: 'Insights' },
+    { name: 'pattern-insights', path: '/pattern-insights', icon: BarChart3, label: 'Analysis' },
+    { name: 'ViewAnalysisScreen', path: '/ViewAnalysisScreen', icon: Bot, label: '', isCenter: true },
     { name: 'community', path: '/community', icon: Users, label: 'Community' },
-    { name: 'ViewAnalysisScreen', path: '/ViewAnalysisScreen', icon: BarChart3, label: 'Analysis' },
     { name: 'notification', path: '/notification', icon: Bell, label: 'Updates' },
   ];
 
@@ -29,9 +29,23 @@ function FloatingTabBar() {
   return (
     <View style={styles.floatingTabBar}>
       {tabs.map((tab) => {
-        const isActive = pathname === tab.path ||
+        const isActive = pathname === tab.path || 
           (tab.path === '/' && (pathname === '/(tabs)' || pathname === '/')) ||
           (pathname.includes(tab.name) && tab.name !== 'index');
+        
+        if (tab.isCenter) {
+          return (
+            <View key={tab.name} style={styles.centerTabWrapper}>
+              <TouchableOpacity
+                style={[styles.centerButton, { backgroundColor: accentColor }]}
+                onPress={() => handlePress(tab.path)}
+                activeOpacity={0.8}
+              >
+                <Bot size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          );
+        }
 
         return (
           <TouchableOpacity
@@ -41,15 +55,15 @@ function FloatingTabBar() {
             activeOpacity={0.6}
           >
             <View style={styles.iconWrapper}>
-              <tab.icon
-                size={22}
-                color={isActive ? accentColor : '#BDBDBD'}
+              <tab.icon 
+                size={22} 
+                color={isActive ? accentColor : '#BDBDBD'} 
                 strokeWidth={1.5}
               />
               {isActive && <View style={[styles.activeDot, { backgroundColor: accentColor }]} />}
             </View>
             <Text style={[
-              styles.tabLabel,
+              styles.tabLabel, 
               { color: isActive ? accentColor : '#BDBDBD' }
             ]}>
               {tab.label}
@@ -104,10 +118,9 @@ export default function TabLayout() {
       >
         <Tabs.Screen name="index" options={{ href: '/' }} />
         <Tabs.Screen name="pattern-insights" options={{ href: '/pattern-insights' }} />
-        <Tabs.Screen name="community" options={{ href: '/community' }} />
         <Tabs.Screen name="ViewAnalysisScreen" options={{ href: '/ViewAnalysisScreen' }} />
+        <Tabs.Screen name="community" options={{ href: '/community' }} />
         <Tabs.Screen name="notification" options={{ href: '/notification' }} />
-
         <Tabs.Screen name="sleep-intelligence" options={{ href: null }} />
         <Tabs.Screen name="activity-detail" options={{ href: null }} />
         <Tabs.Screen name="recovery-signal" options={{ href: null }} />
@@ -172,6 +185,23 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 4,
     letterSpacing: 0.2,
+  },
+  centerTabWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -30,
+  },
+  centerButton: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
   },
   menuOverlay: {
     ...StyleSheet.absoluteFillObject,

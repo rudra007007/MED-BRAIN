@@ -9,47 +9,61 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 const MENU_WIDTH = Math.min(340, Math.round(Dimensions.get('window').width * 0.86));
 
 // Custom Tab Bar Component
-function FloatingTabBar() {
+function FloatingTabBar({ state, descriptors, navigation }: any) {
   const router = useRouter();
   const pathname = usePathname();
   const accentColor = useThemeColor({}, 'accent');
-
+  
   const tabs = [
-    { name: 'index', path: '/', icon: Home, label: 'Home' },
-    { name: 'pattern-insights', path: '/pattern-insights', icon: TrendingUp, label: 'Insights' },
-    { name: 'community', path: '/community', icon: Users, label: 'Community' },
-    { name: 'ViewAnalysisScreen', path: '/ViewAnalysisScreen', icon: BarChart3, label: 'Analysis' },
-    { name: 'notification', path: '/notification', icon: Bell, label: 'Updates' },
+    { name: 'index', icon: Home, label: 'Home' },
+    { name: 'pattern-insights', icon: BarChart3, label: 'Analysis' },
+    { name: 'ViewAnalysisScreen', icon: Bot, label: '', isCenter: true },
+    { name: 'community', icon: Users, label: 'Community' },
+    { name: 'notification', icon: Bell, label: 'Updates' },
   ];
 
-  const handlePress = (path: string) => {
-    router.replace(path as any);
+  const handlePress = (routeName: string) => {
+    router.push(`/(tabs)/${routeName}`);
   };
 
   return (
     <View style={styles.floatingTabBar}>
-      {tabs.map((tab) => {
-        const isActive = pathname === tab.path ||
-          (tab.path === '/' && (pathname === '/(tabs)' || pathname === '/')) ||
-          (pathname.includes(tab.name) && tab.name !== 'index');
+      {tabs.map((tab, index) => {
+        const isActive = pathname.includes(tab.name) || 
+          (tab.name === 'index' && pathname === '/(tabs)') ||
+          (tab.name === 'ViewAnalysisScreen' && pathname.includes('ViewAnalysisScreen'));
+        
+        if (tab.isCenter) {
+          return (
+            <View key={tab.name} style={styles.centerTabWrapper}>
+              <TouchableOpacity
+                style={[styles.centerButton, { backgroundColor: accentColor }]}
+                onPress={() => handlePress(tab.name)}
+                activeOpacity={0.8}
+              >
+                <Bot size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          );
+        }
 
         return (
           <TouchableOpacity
             key={tab.name}
             style={styles.tabItem}
-            onPress={() => handlePress(tab.path)}
+            onPress={() => handlePress(tab.name)}
             activeOpacity={0.6}
           >
             <View style={styles.iconWrapper}>
-              <tab.icon
-                size={22}
-                color={isActive ? accentColor : '#BDBDBD'}
+              <tab.icon 
+                size={22} 
+                color={isActive ? accentColor : '#BDBDBD'} 
                 strokeWidth={1.5}
               />
               {isActive && <View style={[styles.activeDot, { backgroundColor: accentColor }]} />}
             </View>
             <Text style={[
-              styles.tabLabel,
+              styles.tabLabel, 
               { color: isActive ? accentColor : '#BDBDBD' }
             ]}>
               {tab.label}
@@ -99,18 +113,42 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: { display: 'none' },
+          tabBarSceneStyle: { backgroundColor: 'transparent' },
         }}
-        tabBar={() => <FloatingTabBar />}
+        tabBar={(props) => <FloatingTabBar {...props} />}
       >
-        <Tabs.Screen name="index" options={{ href: '/' }} />
-        <Tabs.Screen name="pattern-insights" options={{ href: '/pattern-insights' }} />
-        <Tabs.Screen name="community" options={{ href: '/community' }} />
-        <Tabs.Screen name="ViewAnalysisScreen" options={{ href: '/ViewAnalysisScreen' }} />
-        <Tabs.Screen name="notification" options={{ href: '/notification' }} />
-
-        <Tabs.Screen name="sleep-intelligence" options={{ href: null }} />
-        <Tabs.Screen name="activity-detail" options={{ href: null }} />
-        <Tabs.Screen name="recovery-signal" options={{ href: null }} />
+        <Tabs.Screen
+          name="index"
+          options={{ href: '/(tabs)/index' }}
+        />
+        <Tabs.Screen
+          name="pattern-insights"
+          options={{ href: '/(tabs)/pattern-insights' }}
+        />
+        <Tabs.Screen
+          name="ViewAnalysisScreen"
+          options={{ href: '/(tabs)/ViewAnalysisScreen' }}
+        />
+        <Tabs.Screen
+          name="community"
+          options={{ href: '/(tabs)/community' }}
+        />
+        <Tabs.Screen
+          name="notification"
+          options={{ href: '/(tabs)/notification' }}
+        />
+        <Tabs.Screen
+          name="sleep-intelligence"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="activity-detail"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="recovery-signal"
+          options={{ href: null }}
+        />
       </Tabs>
 
       <View style={StyleSheet.absoluteFill} pointerEvents={isMenuOpen ? "auto" : "none"}>
@@ -173,6 +211,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
     letterSpacing: 0.2,
   },
+  centerTabWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -30,
+  },
+  centerButton: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
+  },
   menuOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#000',
@@ -190,3 +245,6 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
 });
+
+// Text component import at the end to avoid circular dependency
+import { Text } from 'react-native';

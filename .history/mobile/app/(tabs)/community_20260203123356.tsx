@@ -362,7 +362,7 @@ export default function CommunityScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
