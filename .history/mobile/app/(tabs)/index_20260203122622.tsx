@@ -11,6 +11,7 @@ import { useInsightsStore } from '../../store/insights.store';
 import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 import LifestyleTrajectoryRing from '@/components/ui/LifestyleTrajectoryRing';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function HomeScreen() {
   // ... imports
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.greetingSection}>
@@ -159,7 +160,7 @@ export default function HomeScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
