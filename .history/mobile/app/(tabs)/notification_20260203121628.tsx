@@ -138,7 +138,7 @@ export default function NotificationScreen() {
     );
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
             <StatusBar style={isDark ? 'light' : 'dark'} />
 
             {/* Header */}
@@ -162,7 +162,7 @@ export default function NotificationScreen() {
                     </View>
                 }
             />
-        </View>
+        </aView>
     );
 }
 
