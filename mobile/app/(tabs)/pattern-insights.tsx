@@ -16,7 +16,7 @@ import {
   Zap
 } from 'lucide-react-native';
 import ChartScrubber from '../../components/ui/ChartScrubber';
-import { Colors } from '@/constants/theme';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 type ChartSection = {
   id: string;
@@ -35,6 +35,15 @@ type ChartSection = {
 
 export default function PatternInsightsScreen() {
   const [infoModalVisible, setInfoModalVisible] = useState(false);
+
+  // Theme Hooks
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const subTextColor = useThemeColor({}, 'textSecondary');
+  const cardColor = useThemeColor({}, 'backgroundCard');
+  const borderColor = useThemeColor({}, 'border');
+  const iconColor = useThemeColor({}, 'tint');
+  const statusBadgeBg = useThemeColor({}, 'backgroundAccent');
 
   const chartSections: ChartSection[] = [
     {
@@ -56,7 +65,7 @@ export default function PatternInsightsScreen() {
       title: 'Physical Load',
       subtitle: 'Volume Index',
       status: 'Stable',
-      statusColor: '#ffffff',
+      statusColor: '#ffffff', // Might want to make this dynamic too, but status colors often stay semantic
       data: [60, 65, 62, 64, 58, 61, 65],
       gradientColor: '#2d9aff',
       icon: <Activity size={20} color="#2d9aff" />
@@ -78,26 +87,26 @@ export default function PatternInsightsScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors.dark.background }]}>
+    <View style={[styles.container, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>30-Day Relative Trends</Text>
-          <Text style={styles.sectionDescription}>
+          <Text style={[styles.sectionTitle, { color: textColor }]}>30-Day Relative Trends</Text>
+          <Text style={[styles.sectionDescription, { color: subTextColor }]}>
             Comparison of biological signals against baseline. Scrub the charts to see precise daily variance.
           </Text>
         </View>
 
         {chartSections.map((section) => (
-          <View key={section.id} style={styles.chartCard}>
+          <View key={section.id} style={[styles.chartCard, { backgroundColor: cardColor, borderColor }]}>
             <View style={styles.cardHeader}>
               <View>
-                <Text style={styles.chartTitle}>{section.title}</Text>
-                <Text style={styles.chartSubtitle}>{section.subtitle}</Text>
+                <Text style={[styles.chartTitle, { color: textColor }]}>{section.title}</Text>
+                <Text style={[styles.chartSubtitle, { color: subTextColor }]}>{section.subtitle}</Text>
               </View>
               <View
                 style={[
                   styles.statusBadge,
-                  { borderColor: section.statusColor }
+                  { borderColor: section.statusColor, backgroundColor: statusBadgeBg }
                 ]}
               >
                 <Text style={[styles.statusText, { color: section.statusColor }]}>
@@ -116,7 +125,7 @@ export default function PatternInsightsScreen() {
             </View>
 
             {section.insight && (
-              <View style={styles.insightCard}>
+              <View style={[styles.insightCard, { backgroundColor: 'rgba(255,255,255,0.03)', borderColor }]}>
                 <View style={styles.insightHeader}>
                   <View
                     style={[
@@ -127,15 +136,15 @@ export default function PatternInsightsScreen() {
                     {section.icon}
                   </View>
                   <View style={styles.insightContent}>
-                    <Text style={styles.insightTitle}>{section.insight.title}</Text>
-                    <Text style={styles.insightDescription}>{section.insight.description}</Text>
+                    <Text style={[styles.insightTitle, { color: textColor }]}>{section.insight.title}</Text>
+                    <Text style={[styles.insightDescription, { color: subTextColor }]}>{section.insight.description}</Text>
                   </View>
                 </View>
               </View>
             )}
 
             {section.id === 'physical' && (
-              <Text style={styles.chartNote}>
+              <Text style={[styles.chartNote, { color: subTextColor }]}>
                 Movement volume remains within 5% of your 90-day baseline.
               </Text>
             )}
@@ -144,21 +153,27 @@ export default function PatternInsightsScreen() {
 
         <View style={styles.communitySection}>
           <View style={styles.communityHeader}>
-            <Users size={18} color="rgba(255,255,255,0.3)" />
-            <Text style={styles.communityLabel}>Community Pulse</Text>
+            <Users size={18} color={subTextColor} />
+            <Text style={[styles.communityLabel, { color: subTextColor }]}>Community Pulse</Text>
           </View>
-          <Text style={styles.communityText}>
+          <Text style={[styles.communityText, { color: subTextColor }]}>
             {`You are currently experiencing a similar "late-shift" drift as `}
             <Text style={styles.communityHighlight}>14% of people</Text>
             {` in your city this week.`}
           </Text>
-
         </View>
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      <InfoModal visible={infoModalVisible} onClose={() => setInfoModalVisible(false)} />
+      <InfoModal
+        visible={infoModalVisible}
+        onClose={() => setInfoModalVisible(false)}
+        textColor={textColor}
+        subTextColor={subTextColor}
+        backgroundColor={cardColor}
+        borderColor={borderColor}
+      />
 
     </View>
   );
@@ -167,7 +182,6 @@ export default function PatternInsightsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0e0f'
   },
   header: {
     flexDirection: 'row',
@@ -176,7 +190,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
   },
   backButton: {
     padding: 8
@@ -184,7 +197,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#FFFFFF',
     flex: 1,
     textAlign: 'center'
   },
@@ -202,19 +214,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 8
   },
   sectionDescription: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.5)',
     lineHeight: 20
   },
   chartCard: {
-    backgroundColor: '#161c1e',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
     padding: 20,
     marginBottom: 16
   },
@@ -227,13 +235,11 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 4
   },
   chartSubtitle: {
     fontSize: 11,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
     textTransform: 'uppercase',
     letterSpacing: 0.5
   },
@@ -242,7 +248,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,0.03)'
   },
   statusText: {
     fontSize: 10,
@@ -257,10 +262,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   insightCard: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
     padding: 12
   },
   insightHeader: {
@@ -280,17 +283,14 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 4
   },
   insightDescription: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.6)',
     lineHeight: 16
   },
   chartNote: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
     textAlign: 'center',
     fontStyle: 'italic',
     marginTop: 12
@@ -308,13 +308,11 @@ const styles = StyleSheet.create({
   communityLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.3)',
     textTransform: 'uppercase',
     letterSpacing: 1
   },
   communityText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
     lineHeight: 20
   },
   communityHighlight: {
@@ -324,43 +322,12 @@ const styles = StyleSheet.create({
   bottomSpacing: {
     height: 20
   },
-  navBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
-    backgroundColor: 'rgba(10, 14, 15, 0.9)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 8
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingVertical: 8
-  },
-  navItemActive: {
-  },
-  navLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)'
-  },
-  navLabelActive: {
-    color: '#14f1d9'
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end'
   },
   modalContainer: {
-    backgroundColor: '#0a0e0f',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: Dimensions.get('window').height * 0.85,
@@ -373,12 +340,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF'
   },
   modalCloseButton: {
     padding: 4
@@ -392,7 +357,6 @@ const styles = StyleSheet.create({
   },
   modalDescription: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.6)',
     lineHeight: 20,
     marginBottom: 24
   },
@@ -402,23 +366,19 @@ const styles = StyleSheet.create({
   infoSectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#FFFFFF',
     marginBottom: 6
   },
   infoSectionDescription: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
     lineHeight: 18
   },
   modalFooter: {
     marginTop: 24,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)'
   },
   modalFooterText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.3)',
     textAlign: 'center'
   }
 });
@@ -426,9 +386,13 @@ const styles = StyleSheet.create({
 type InfoModalProps = {
   visible: boolean;
   onClose: () => void;
+  textColor: string;
+  subTextColor: string;
+  backgroundColor: string;
+  borderColor: string;
 };
 
-function InfoModal({ visible, onClose }: InfoModalProps) {
+function InfoModal({ visible, onClose, textColor, subTextColor, backgroundColor, borderColor }: InfoModalProps) {
   const infoSections = [
     {
       title: 'Sleep Consistency',
@@ -460,29 +424,29 @@ function InfoModal({ visible, onClose }: InfoModalProps) {
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>About Insights</Text>
+        <View style={[styles.modalContainer, { backgroundColor }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: borderColor }]}>
+            <Text style={[styles.modalTitle, { color: textColor }]}>About Insights</Text>
             <TouchableOpacity onPress={onClose} style={styles.modalCloseButton}>
-              <X size={24} color="#FFFFFF" />
+              <X size={24} color={textColor} />
             </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} style={styles.modalScroll}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalDescription}>
+              <Text style={[styles.modalDescription, { color: subTextColor }]}>
                 Interactive Lifestyle Trends analyzes your health data to provide personalized insights about your daily patterns and biological rhythms.
               </Text>
 
               {infoSections.map((section, index) => (
                 <View key={index} style={styles.infoSection}>
-                  <Text style={styles.infoSectionTitle}>{section.title}</Text>
-                  <Text style={styles.infoSectionDescription}>{section.description}</Text>
+                  <Text style={[styles.infoSectionTitle, { color: textColor }]}>{section.title}</Text>
+                  <Text style={[styles.infoSectionDescription, { color: subTextColor }]}>{section.description}</Text>
                 </View>
               ))}
 
-              <View style={styles.modalFooter}>
-                <Text style={styles.modalFooterText}>
+              <View style={[styles.modalFooter, { borderTopColor: borderColor }]}>
+                <Text style={[styles.modalFooterText, { color: subTextColor }]}>
                   Data is analyzed locally and never shared without your consent.
                 </Text>
               </View>

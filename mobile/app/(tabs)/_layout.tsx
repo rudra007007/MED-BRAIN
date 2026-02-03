@@ -4,6 +4,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { Animated, Dimensions, Pressable, StyleSheet, View } from "react-native";
 import AppHeader from "@/components/common/AppHeader";
 import Menubar from "@/components/common/menubar";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 const MENU_WIDTH = Math.min(340, Math.round(Dimensions.get('window').width * 0.86));
 
@@ -38,18 +39,23 @@ export default function TabLayout() {
     outputRange: [MENU_WIDTH, 0],
   });
 
+  const tabBarBg = useThemeColor({}, 'background'); // or backgroundAccent
+  const tabBarBorder = useThemeColor({}, 'border');
+  const activeColor = useThemeColor({}, 'tint');
+  const inactiveColor = useThemeColor({}, 'tabIconDefault');
+
   return (
     <>
       <AppHeader userName="Alex" onMenuPress={openMenu} />
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: '#14f1d9',
-          tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
+          tabBarActiveTintColor: activeColor,
+          tabBarInactiveTintColor: inactiveColor,
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#0a0e0f',
+            backgroundColor: tabBarBg,
             borderTopWidth: 1,
-            borderTopColor: 'rgba(255,255,255,0.08)',
+            borderTopColor: tabBarBorder,
             paddingTop: 10,
             paddingBottom: 10,
             height: 70,

@@ -14,13 +14,15 @@ import {
 } from 'react-native';
 import { X, Send, Plus } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCommunityStore, type ReactionType, type CommunityPost } from '@/store/community.store';
 import Post from '@/components/community/Post';
 import Comment from '@/components/community/Comment';
 import { mockCommunityPosts, mockCommunityComments } from '@/mocks/communitydata';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function CommunityScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme ?? 'light'];
   const isDark = colorScheme === 'dark';
 
@@ -118,7 +120,7 @@ export default function CommunityScreen() {
   const postComments = selectedPostId ? comments[selectedPostId] || [] : [];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
       {/* Header */}
@@ -360,7 +362,7 @@ export default function CommunityScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 

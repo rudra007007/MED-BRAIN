@@ -9,30 +9,50 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, Moon, Heart, Footprints, CheckCircle, RefreshCw, Smartphone } from 'lucide-react-native';
+import { ArrowLeft, Moon, Heart, Footprints, CheckCircle, RefreshCw, Activity } from 'lucide-react-native';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function HealthSetupScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  // State for data points
+  const [selectedPoints, setSelectedPoints] = useState({
+    sleep: true,
+    heartRate: true,
+    steps: true
+  });
+
+  // Theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const subTextColor = useThemeColor({}, 'textSecondary');
+  const cardColor = useThemeColor({}, 'backgroundCard');
+  const borderColor = useThemeColor({}, 'border');
+  const iconColor = useThemeColor({}, 'tint');
+  const itemBg = useThemeColor({}, 'backgroundAccent');
+
+  const togglePoint = (key: keyof typeof selectedPoints) => {
+    setSelectedPoints(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleContinue = async () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       router.push('/onboarding/trust-privacy');
-      // router.push('/(tabs)');
     }, 1500);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#13c8ec" />
+          <ArrowLeft size={24} color={iconColor} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Intelligence Setup</Text>
+        <Text style={[styles.headerTitle, { color: textColor }]}>Intelligence Setup</Text>
         <View style={styles.headerSpace} />
       </View>
 
@@ -46,29 +66,30 @@ export default function HealthSetupScreen() {
         </View>
 
         <View style={styles.headingSection}>
-          <Text style={styles.heading}>Connect your health data</Text>
-          <Text style={styles.subheading}>Sync your existing devices to enable non-diagnostic trend analysis.</Text>
+          <Text style={[styles.heading, { color: textColor }]}>Connect your health data</Text>
+          <Text style={[styles.subheading, { color: subTextColor }]}>Sync your existing devices to enable non-diagnostic trend analysis.</Text>
         </View>
 
         {/* Info Card */}
-        <View style={styles.cardContainer}>
+        <View style={[styles.cardContainer, { backgroundColor: cardColor, borderColor }]}>
           <View style={styles.cardContent}>
             <View style={styles.iconWrapper}>
               <RefreshCw size={24} color="#13c8ec" />
             </View>
             <View style={styles.textWrapper}>
-              <Text style={styles.cardTitle}>Building your baseline</Text>
-              <Text style={styles.cardDescription}>
+              <Text style={[styles.cardTitle, { color: textColor }]}>Building your baseline</Text>
+              <Text style={[styles.cardDescription, { color: subTextColor }]}>
                 To build your personal baseline, we sync your existing sleep and activity signals. This helps AI identify lifestyle risk drift.
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Connect Button */}
+        {/* Replaced 'Connect Apple Health' with generic 'Connect Health Data' or relevant action */}
+        {/* User requested "Remove the option 'Connect Apple Health' with some relevant option" */}
         <TouchableOpacity style={styles.connectButton}>
-          <Heart size={24} color="#000" fill="#000" />
-          <Text style={styles.connectButtonText}>Connect Apple Health</Text>
+          <Activity size={24} color="#000" />
+          <Text style={styles.connectButtonText}>Connect Health Sources</Text>
         </TouchableOpacity>
 
         {/* Data Points Section */}
@@ -76,39 +97,71 @@ export default function HealthSetupScreen() {
           <Text style={styles.sectionHeader}>DATA POINTS TO BE SYNCED</Text>
 
           <View style={styles.listContainer}>
-            {/* Item 1 */}
-            <View style={styles.listItem}>
+            {/* Item 1: Sleep */}
+            <TouchableOpacity
+              style={[
+                styles.listItem,
+                { backgroundColor: itemBg, borderColor },
+                selectedPoints.sleep && { borderColor: '#13c8ec', backgroundColor: 'rgba(19, 200, 236, 0.05)' }
+              ]}
+              onPress={() => togglePoint('sleep')}
+              activeOpacity={0.7}
+            >
               <View style={styles.itemLeft}>
                 <Moon size={24} color="#13c8ec" />
-                <Text style={styles.itemText}>Sleep stages</Text>
+                <Text style={[styles.itemText, { color: textColor }]}>Sleep stages</Text>
               </View>
-              <CheckCircle size={24} color="#13c8ec" fill="#13c8ec" stroke="#1c2527" />
-              {/* Note: The checkmark in design seems to be filled. Using fill prop if supported or just color. 
-                  Standard lucide CheckCircle doesn't fill the circle background easily without fill prop. 
-                  Let's assume standard stroke for now or try to match style. 
-                  Design shows blue circle with check inside? Or check with circle?
-                  The icon is 'check_circle' from material symbols. It's usually a filled circle with a check.
-                  Lucide 'CheckCircle' is a circle with a check. detailed implementation depends on library version.
-              */}
-            </View>
+              <CheckCircle
+                size={24}
+                color={selectedPoints.sleep ? "#13c8ec" : subTextColor}
+                fill={selectedPoints.sleep ? "#13c8ec" : "transparent"}
+                stroke={selectedPoints.sleep ? "#1c2527" : subTextColor}
+              />
+            </TouchableOpacity>
 
-            {/* Item 2 */}
-            <View style={styles.listItem}>
+            {/* Item 2: Heart Rate */}
+            <TouchableOpacity
+              style={[
+                styles.listItem,
+                { backgroundColor: itemBg, borderColor },
+                selectedPoints.heartRate && { borderColor: '#13c8ec', backgroundColor: 'rgba(19, 200, 236, 0.05)' }
+              ]}
+              onPress={() => togglePoint('heartRate')}
+              activeOpacity={0.7}
+            >
               <View style={styles.itemLeft}>
                 <Heart size={24} color="#13c8ec" />
-                <Text style={styles.itemText}>Heart Rate</Text>
+                <Text style={[styles.itemText, { color: textColor }]}>Heart Rate</Text>
               </View>
-              <CheckCircle size={24} color="#13c8ec" fill="#13c8ec" stroke="#1c2527" />
-            </View>
+              <CheckCircle
+                size={24}
+                color={selectedPoints.heartRate ? "#13c8ec" : subTextColor}
+                fill={selectedPoints.heartRate ? "#13c8ec" : "transparent"}
+                stroke={selectedPoints.heartRate ? "#1c2527" : subTextColor}
+              />
+            </TouchableOpacity>
 
-            {/* Item 3 */}
-            <View style={styles.listItem}>
+            {/* Item 3: Steps */}
+            <TouchableOpacity
+              style={[
+                styles.listItem,
+                { backgroundColor: itemBg, borderColor },
+                selectedPoints.steps && { borderColor: '#13c8ec', backgroundColor: 'rgba(19, 200, 236, 0.05)' }
+              ]}
+              onPress={() => togglePoint('steps')}
+              activeOpacity={0.7}
+            >
               <View style={styles.itemLeft}>
                 <Footprints size={24} color="#13c8ec" />
-                <Text style={styles.itemText}>Steps</Text>
+                <Text style={[styles.itemText, { color: textColor }]}>Steps</Text>
               </View>
-              <CheckCircle size={24} color="#13c8ec" fill="#13c8ec" stroke="#1c2527" />
-            </View>
+              <CheckCircle
+                size={24}
+                color={selectedPoints.steps ? "#13c8ec" : subTextColor}
+                fill={selectedPoints.steps ? "#13c8ec" : "transparent"}
+                stroke={selectedPoints.steps ? "#1c2527" : subTextColor}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -129,7 +182,7 @@ export default function HealthSetupScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/(tabs)')}>
-            <Text style={styles.skipText}>Maybe later</Text>
+            <Text style={[styles.skipText, { color: subTextColor }]}>Maybe later</Text>
           </TouchableOpacity>
         </View>
 
@@ -143,7 +196,6 @@ export default function HealthSetupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#101f22', // background-dark
   },
   header: {
     flexDirection: 'row',
@@ -151,8 +203,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#101f22', // Match body bg or header specific if needed
-    // sticky top 0 z-10 equivalent handled by ScrollView structure or just consistent bg
   },
   backButton: {
     width: 48,
@@ -165,8 +215,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
-    // right padding handled by headerSpace to center title
   },
   headerSpace: {
     width: 48,
@@ -186,10 +234,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 6,
     borderRadius: 9999,
-    backgroundColor: '#3b4f54', // Gray/Dark inactive
+    backgroundColor: '#3b4f54',
   },
   progressDotActive: {
-    backgroundColor: '#13c8ec', // Primary
+    backgroundColor: '#13c8ec',
   },
   headingSection: {
     paddingTop: 8,
@@ -198,7 +246,6 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
     textAlign: 'left',
     marginBottom: 8,
     lineHeight: 34,
@@ -206,12 +253,9 @@ const styles = StyleSheet.create({
   subheading: {
     fontSize: 16,
     fontWeight: '400',
-    color: '#9db4b9', // text-gray-600 dark mode equivalent roughly
     lineHeight: 24,
   },
   cardContainer: {
-    backgroundColor: '#1c2527',
-    borderColor: '#3b4f54',
     borderWidth: 1,
     borderRadius: 16,
     padding: 20,
@@ -223,7 +267,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   iconWrapper: {
-    backgroundColor: 'rgba(19, 200, 236, 0.2)', // primary/20
+    backgroundColor: 'rgba(19, 200, 236, 0.2)',
     padding: 8,
     borderRadius: 8,
   },
@@ -231,13 +275,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    color: '#FFFFFF',
-    fontSize: 16, // usually h3 default logic or explicitly set
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
   },
   cardDescription: {
-    color: '#9db4b9',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -269,7 +311,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 1.5, // tracking-widest
+    letterSpacing: 1.5,
     color: '#5c757a',
     paddingHorizontal: 4,
   },
@@ -281,8 +323,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: 'rgba(28, 37, 39, 0.5)', // #1c2527 / 50
-    borderColor: 'rgba(59, 79, 84, 0.3)', // #3b4f54 / 30
     borderWidth: 1,
     borderRadius: 12,
   },
@@ -294,10 +334,9 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#e2e8f0', // gray-200
   },
   spacer: {
-    flex: 1, // push footer to bottom if container has height
+    flex: 1,
     minHeight: 24,
   },
   footer: {
@@ -307,7 +346,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     width: '100%',
-    backgroundColor: '#13c8ec', // Primary
+    backgroundColor: '#13c8ec',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -329,7 +368,6 @@ const styles = StyleSheet.create({
   skipText: {
     width: '100%',
     textAlign: 'center',
-    color: '#9db4b9',
     fontSize: 16,
     fontWeight: '500',
   },

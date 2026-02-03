@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -13,6 +14,7 @@ const queryClient = new QueryClient();
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Back" }}>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding/auth" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding/signup" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding/personalize" options={{ headerShown: false }} />
@@ -20,12 +22,12 @@ function RootLayoutNav() {
       <Stack.Screen name="onboarding/trust-privacy" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="health/symptom-input" options={{ headerShown: false }} />
-      <Stack.Screen name="health/pattern-insights" options={{ headerShown: false}} />
-      <Stack.Screen name="details/sleep-intelligence" options={{ headerShown: false}} />
-      <Stack.Screen name="details/activity-detail" options={{ headerShown: false}} />
-      <Stack.Screen name="details/recovery-signal" options={{ headerShown: false}} />
-      <Stack.Screen name="profile" options={{ headerShown: false}} />
-      <Stack.Screen name="menu" options={{headerShown: false, headerLeft: undefined, }}/>
+      <Stack.Screen name="health/pattern-insights" options={{ headerShown: false }} />
+      <Stack.Screen name="details/sleep-intelligence" options={{ headerShown: false }} />
+      <Stack.Screen name="details/activity-detail" options={{ headerShown: false }} />
+      <Stack.Screen name="details/recovery-signal" options={{ headerShown: false }} />
+      <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen name="menu" options={{ headerShown: false, headerLeft: undefined, }} />
     </Stack>
   );
 }
@@ -37,9 +39,11 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView>
-        <RootLayoutNav />
-      </GestureHandlerRootView>
+      <ThemeProvider>
+        <GestureHandlerRootView>
+          <RootLayoutNav />
+        </GestureHandlerRootView>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

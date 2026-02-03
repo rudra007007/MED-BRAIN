@@ -8,12 +8,14 @@ import type { HealthSignal } from '../../types/health';
 import { useAnalyticsStore } from '../../store/analytics.store';
 import { useHealthStore } from '../../store/health.store';
 import { useInsightsStore } from '../../store/insights.store';
+import { useTheme } from '@/context/ThemeContext';
 import { Colors } from '@/constants/theme';
 import LifestyleTrajectoryRing from '@/components/ui/LifestyleTrajectoryRing';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme ?? 'light'];
   const { checkBackend } = useAnalyticsStore();
   const { fetchHealthData } = useHealthStore();
@@ -47,8 +49,12 @@ export default function HomeScreen() {
     }
   };
 
+
+
+  // ... imports
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.greetingSection}>
@@ -114,7 +120,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         {patternInsights.length > 0 && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.insightCardWrapper, { backgroundColor: colors.backgroundCard }]}
             activeOpacity={0.85}
             onPress={() => router.push('/pattern-insights')}
@@ -154,7 +160,7 @@ export default function HomeScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

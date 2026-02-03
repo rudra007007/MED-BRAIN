@@ -11,12 +11,22 @@ import {
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { Apple } from 'lucide-react-native';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function AuthScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const subTextColor = useThemeColor({}, 'textSecondary');
+  const cardColor = useThemeColor({}, 'backgroundCard');
+  const borderColor = useThemeColor({}, 'border');
+  const inputBg = useThemeColor({}, 'backgroundAccent');
+  const logoBg = 'rgba(19, 200, 236, 0.1)';
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -29,46 +39,46 @@ export default function AuthScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.topSection}>
           <View style={styles.logoContainer}>
-            <View style={styles.logo}>
+            <View style={[styles.logo, { backgroundColor: logoBg }]}>
               <Text style={styles.logoText}>🛡️</Text>
             </View>
-            <Text style={styles.logoLabel}>Health Intelligence</Text>
+            <Text style={[styles.logoLabel, { color: textColor }]}>Health Intelligence</Text>
           </View>
 
-          <Text style={styles.title}>Your Health Intelligence, Secured.</Text>
-          <Text style={styles.subtitle}>Access personalized insights and community trends.</Text>
+          <Text style={[styles.title, { color: textColor }]}>Your Health Intelligence, Secured.</Text>
+          <Text style={[styles.subtitle, { color: subTextColor }]}>Access personalized insights and community trends.</Text>
         </View>
 
         <View style={styles.authSection}>
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialButtonIcon}>🍎</Text>
-            <Text style={styles.socialButtonText}>Continue with Apple</Text>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: cardColor, borderColor }]}>
+            <Apple size={20} color={textColor} style={{ marginRight: 12 }} />
+            <Text style={[styles.socialButtonText, { color: textColor }]}>Continue with Apple</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialButtonIcon}>G</Text>
-            <Text style={styles.socialButtonText}>Continue with Google</Text>
+          <TouchableOpacity style={[styles.socialButton, { backgroundColor: cardColor, borderColor }]}>
+            <Text style={[styles.socialButtonIcon, { color: textColor }]}>G</Text>
+            <Text style={[styles.socialButtonText, { color: textColor }]}>Continue with Google</Text>
           </TouchableOpacity>
 
           <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: borderColor }]} />
+            <Text style={[styles.dividerText, { color: subTextColor }]}>or</Text>
+            <View style={[styles.divider, { backgroundColor: borderColor }]} />
           </View>
 
           <View style={styles.formSection}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email Address</Text>
+              <Text style={[styles.inputLabel, { color: subTextColor }]}>Email Address</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: inputBg, borderColor, color: textColor }]}
                 placeholder="name@example.com"
-                placeholderTextColor="#64748b"
+                placeholderTextColor={subTextColor}
                 value={email}
                 onChangeText={setEmail}
                 editable={!loading}
@@ -77,15 +87,15 @@ export default function AuthScreen() {
 
             <View style={styles.inputGroup}>
               <View style={styles.passwordLabelContainer}>
-                <Text style={styles.inputLabel}>Password</Text>
+                <Text style={[styles.inputLabel, { color: subTextColor }]}>Password</Text>
                 <TouchableOpacity disabled={loading}>
                   <Text style={styles.forgotButton}>Forgot?</Text>
                 </TouchableOpacity>
               </View>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: inputBg, borderColor, color: textColor }]}
                 placeholder="••••••••"
-                placeholderTextColor="#64748b"
+                placeholderTextColor={subTextColor}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -93,7 +103,7 @@ export default function AuthScreen() {
               />
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.signInButton, loading && styles.signInButtonDisabled]}
               onPress={handleSignIn}
               disabled={loading}
@@ -106,7 +116,7 @@ export default function AuthScreen() {
             </TouchableOpacity>
 
             <View style={styles.signUpContainer}>
-              <Text style={styles.signUpText}>Don't have an account? </Text>
+              <Text style={[styles.signUpText, { color: subTextColor }]}>Don't have an account? </Text>
               <TouchableOpacity onPress={() => router.push('/onboarding/signup')} disabled={loading}>
                 <Text style={styles.signUpLink}>Sign Up</Text>
               </TouchableOpacity>
@@ -114,11 +124,11 @@ export default function AuthScreen() {
           </View>
         </View>
 
-        <View style={styles.privacyContainer}>
+        <View style={[styles.privacyContainer, { backgroundColor: cardColor, borderColor }]}>
           <Text style={styles.privacyIcon}>🔒</Text>
-          <View>
-            <Text style={styles.privacyTitle}>Privacy Commitment</Text>
-            <Text style={styles.privacyText}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.privacyTitle, { color: textColor }]}>Privacy Commitment</Text>
+            <Text style={[styles.privacyText, { color: subTextColor }]}>
               Your health data is end-to-end encrypted and fully anonymized. We never sell your personal information to third parties.{' '}
               <Text style={styles.learnMoreLink}>Learn more</Text>
             </Text>
@@ -132,7 +142,6 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#101f22'
   },
   scrollContent: {
     paddingHorizontal: 24,
@@ -151,7 +160,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 12,
-    backgroundColor: 'rgba(19, 200, 236, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12
@@ -162,19 +170,16 @@ const styles = StyleSheet.create({
   logoLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF'
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 8,
     lineHeight: 40
   },
   subtitle: {
     fontSize: 14,
-    color: '#9db4b9',
     textAlign: 'center',
     lineHeight: 20
   },
@@ -187,9 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 56,
     borderRadius: 12,
-    backgroundColor: '#1a2b2e',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
     marginBottom: 12
   },
   socialButtonIcon: {
@@ -198,7 +201,6 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   socialButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600'
   },
@@ -210,10 +212,8 @@ const styles = StyleSheet.create({
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)'
   },
   dividerText: {
-    color: '#9db4b9',
     fontSize: 12,
     fontWeight: '700',
     marginHorizontal: 16,
@@ -228,7 +228,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#9db4b9',
     textTransform: 'uppercase'
   },
   passwordLabelContainer: {
@@ -240,10 +239,7 @@ const styles = StyleSheet.create({
     height: 56,
     paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: 'rgba(26, 43, 46, 0.5)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    color: '#FFFFFF',
     fontSize: 14,
     fontFamily: 'Inter'
   },
@@ -276,7 +272,6 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     fontSize: 14,
-    color: '#e2e8f0',
     fontWeight: '500'
   },
   signUpLink: {
@@ -286,11 +281,9 @@ const styles = StyleSheet.create({
   },
   privacyContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
     gap: 16,
     marginTop: 40,
     marginBottom: 40
@@ -302,12 +295,10 @@ const styles = StyleSheet.create({
   privacyTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 4
   },
   privacyText: {
     fontSize: 12,
-    color: '#9db4b9',
     lineHeight: 18
   },
   learnMoreLink: {

@@ -12,11 +12,12 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import { Send, Bot, User } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useInsightsStore } from '../../store/insights.store';
 import { useBotStore } from '../../store/bot.store';
+import { useTheme } from '@/context/ThemeContext';
 
 type Message = {
   id: string;
@@ -26,7 +27,7 @@ type Message = {
 };
 
 export default function ViewAnalysisScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const colors = Colors[colorScheme ?? 'light'];
   const { fetchPatternInsights } = useInsightsStore();
   const { botMessage, setBotMessage, sendBotMessage } = useBotStore();
@@ -102,7 +103,7 @@ export default function ViewAnalysisScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={undefined}
@@ -206,7 +207,7 @@ export default function ViewAnalysisScreen() {
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
   );
 }
 

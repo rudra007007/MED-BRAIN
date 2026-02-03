@@ -7,30 +7,40 @@ import {
   View
 } from 'react-native';
 import ChartScrubber from '../../components/ui/ChartScrubber';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function RecoverySignalScreen() {
   const hrvData = [60, 55, 70, 50, 75, 55, 62];
 
+  // Theme Hooks
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const subTextColor = useThemeColor({}, 'textSecondary');
+  const cardColor = useThemeColor({}, 'backgroundCard');
+  const borderColor = useThemeColor({}, 'border');
+  const tintColor = useThemeColor({}, 'tint');
+  const cardItemBg = useThemeColor({}, 'backgroundAccent');
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.hrvSection}>
           <View style={styles.hrvIcon}>
             <Text style={styles.hrvIconText}>💓</Text>
           </View>
-          <Text style={styles.hrvValue}>55</Text>
-          <Text style={styles.hrvUnit}>ms</Text>
-          <Text style={styles.hrvLabel}>Heart Rate Variability (HRV)</Text>
+          <Text style={[styles.hrvValue, { color: textColor }]}>55</Text>
+          <Text style={[styles.hrvUnit, { color: subTextColor }]}>ms</Text>
+          <Text style={[styles.hrvLabel, { color: subTextColor }]}>Heart Rate Variability (HRV)</Text>
           <View style={styles.statusBadge}>
             <Text style={styles.statusText}>SLIGHTLY SUPPRESSED</Text>
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: cardItemBg, borderColor }]}>
           <View style={styles.cardHeader}>
             <View>
-              <Text style={styles.cardTitle}>Trend Analysis</Text>
-              <Text style={styles.cardSubtitle}>Vs. 60-day baseline (62ms)</Text>
+              <Text style={[styles.cardTitle, { color: textColor }]}>Trend Analysis</Text>
+              <Text style={[styles.cardSubtitle, { color: subTextColor }]}>Vs. 60-day baseline (62ms)</Text>
             </View>
           </View>
 
@@ -44,37 +54,37 @@ export default function RecoverySignalScreen() {
           </View>
 
           <View style={styles.dayLabels}>
-            <Text style={styles.dayLabel}>MON</Text>
-            <Text style={styles.dayLabel}>TUE</Text>
-            <Text style={styles.dayLabel}>WED</Text>
-            <Text style={styles.dayLabel}>THU</Text>
-            <Text style={styles.dayLabel}>FRI</Text>
-            <Text style={styles.dayLabel}>SAT</Text>
-            <Text style={[styles.dayLabel, styles.dayLabelActive]}>SUN</Text>
+            {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => (
+              <Text key={day} style={[
+                styles.dayLabel,
+                { color: subTextColor },
+                day === 'SUN' && { color: textColor }
+              ]}>{day}</Text>
+            ))}
           </View>
         </View>
 
-        <View style={styles.insightCard}>
-          <Text style={styles.insightTitle}>AI CORRELATION INSIGHT</Text>
-          <Text style={styles.insightText}>
+        <View style={[styles.insightCard, { backgroundColor: cardColor, borderColor }]}>
+          <Text style={[styles.insightTitle, { color: tintColor }]}>AI CORRELATION INSIGHT</Text>
+          <Text style={[styles.insightText, { color: textColor }]}>
             Recovery signal is slightly suppressed today, likely linked to the{' '}
-            <Text style={styles.insightHighlight}>late meal detected last night</Text>.
+            <Text style={[styles.insightHighlight, { color: tintColor }]}>late meal detected last night</Text>.
           </Text>
 
-          <View style={styles.correlationList}>
+          <View style={[styles.correlationList, { borderTopColor: borderColor }]}>
             <View style={styles.correlationItem}>
               <Text style={styles.correlationIcon}>🍽️</Text>
               <View style={styles.correlationContent}>
-                <Text style={styles.correlationTitle}>Metabolic activity spike</Text>
-                <Text style={styles.correlationDesc}>Digestion at 11:45 PM elevated resting heart rate.</Text>
+                <Text style={[styles.correlationTitle, { color: textColor }]}>Metabolic activity spike</Text>
+                <Text style={[styles.correlationDesc, { color: subTextColor }]}>Digestion at 11:45 PM elevated resting heart rate.</Text>
               </View>
             </View>
 
             <View style={styles.correlationItem}>
               <Text style={styles.correlationIcon}>🛏️</Text>
               <View style={styles.correlationContent}>
-                <Text style={styles.correlationTitle}>Reduced REM stability</Text>
-                <Text style={styles.correlationDesc}>
+                <Text style={[styles.correlationTitle, { color: textColor }]}>Reduced REM stability</Text>
+                <Text style={[styles.correlationDesc, { color: subTextColor }]}>
                   Body focused on processing nutrients during peak rest cycles.
                 </Text>
               </View>
@@ -83,15 +93,15 @@ export default function RecoverySignalScreen() {
         </View>
 
         <View style={styles.recommendationsSection}>
-          <Text style={styles.recommendationsTitle}>Recommendations</Text>
-          <TouchableOpacity style={styles.recommendationItem}>
+          <Text style={[styles.recommendationsTitle, { color: textColor }]}>Recommendations</Text>
+          <TouchableOpacity style={[styles.recommendationItem, { backgroundColor: cardItemBg, borderColor }]}>
             <Text style={styles.recommendationIcon}>💧</Text>
-            <Text style={styles.recommendationText}>Increase hydration today</Text>
+            <Text style={[styles.recommendationText, { color: textColor }]}>Increase hydration today</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.recommendationItem}>
+          <TouchableOpacity style={[styles.recommendationItem, { backgroundColor: cardItemBg, borderColor }]}>
             <Text style={styles.recommendationIcon}>⏰</Text>
-            <Text style={styles.recommendationText}>Set meal reminder for 7 PM</Text>
+            <Text style={[styles.recommendationText, { color: textColor }]}>Set meal reminder for 7 PM</Text>
           </TouchableOpacity>
         </View>
 
@@ -104,29 +114,6 @@ export default function RecoverySignalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F171A'
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
-  },
-  backButton: {
-    padding: 8
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    flex: 1,
-    textAlign: 'center'
-  },
-  shareButton: {
-    padding: 8
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -154,19 +141,16 @@ const styles = StyleSheet.create({
   hrvValue: {
     fontSize: 56,
     fontWeight: '900',
-    color: '#FFFFFF',
     letterSpacing: -1
   },
   hrvUnit: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#8E8E93',
     marginLeft: 4
   },
   hrvLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#8E8E93',
     marginTop: 8,
     marginBottom: 12
   },
@@ -185,9 +169,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1
   },
   card: {
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
     borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.5)',
     borderRadius: 24,
     padding: 20,
     marginBottom: 20
@@ -200,12 +182,10 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 4
   },
   cardSubtitle: {
     fontSize: 12,
-    color: '#8E8E93'
   },
   dayLabels: {
     flexDirection: 'row',
@@ -216,15 +196,9 @@ const styles = StyleSheet.create({
   dayLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#8E8E93'
-  },
-  dayLabelActive: {
-    color: '#FFFFFF'
   },
   insightCard: {
-    backgroundColor: 'rgba(21, 28, 36, 0.8)',
     borderWidth: 1,
-    borderColor: 'rgba(45, 212, 191, 0.2)',
     borderRadius: 20,
     padding: 20,
     marginBottom: 24
@@ -232,24 +206,20 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#2DD4BF',
     letterSpacing: 1,
     marginBottom: 12
   },
   insightText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
     lineHeight: 22,
     marginBottom: 16
   },
   insightHighlight: {
-    color: '#2DD4BF',
     fontWeight: '700'
   },
   correlationList: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
     paddingTop: 16,
     gap: 12
   },
@@ -268,12 +238,10 @@ const styles = StyleSheet.create({
   correlationTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#F0F0F0',
     marginBottom: 2
   },
   correlationDesc: {
     fontSize: 12,
-    color: '#8E8E93',
     lineHeight: 16
   },
   recommendationsSection: {
@@ -282,13 +250,10 @@ const styles = StyleSheet.create({
   recommendationsTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 12
   },
   recommendationItem: {
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
     borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.5)',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 16,
@@ -303,39 +268,8 @@ const styles = StyleSheet.create({
   recommendationText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#F0F0F0'
   },
   bottomSpacing: {
     height: 20
-  },
-  navBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: 'rgba(15, 23, 26, 0.9)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 16
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1
-  },
-  navItemActive: {
-  },
-  navLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.5
-  },
-  navLabelActive: {
-    color: '#2DD4BF'
   }
 });

@@ -6,12 +6,21 @@ import {
   View
 } from 'react-native';
 import ChartScrubber from '../../components/ui/ChartScrubber';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function SleepIntelligenceScreen() {
   const sleepTrendData = [60, 72, 68, 80, 75, 70, 82];
 
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const subTextColor = useThemeColor({}, 'textSecondary');
+  const cardColor = useThemeColor({}, 'backgroundCard');
+  const borderColor = useThemeColor({}, 'border');
+  const accentColor = useThemeColor({}, 'tint');
+  const cardItemBg = useThemeColor({}, 'backgroundAccent');
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.scoreSection}>
           <View style={styles.scoreGlow} />
@@ -20,18 +29,18 @@ export default function SleepIntelligenceScreen() {
         </View>
 
         <View style={styles.metricsGrid}>
-          <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>DURATION</Text>
-            <Text style={styles.metricValue}>7h 42m</Text>
+          <View style={[styles.metricCard, { backgroundColor: cardItemBg, borderColor }]}>
+            <Text style={[styles.metricLabel, { color: subTextColor }]}>DURATION</Text>
+            <Text style={[styles.metricValue, { color: textColor }]}>7h 42m</Text>
           </View>
-          <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>EFFICIENCY</Text>
-            <Text style={styles.metricValue}>91%</Text>
+          <View style={[styles.metricCard, { backgroundColor: cardItemBg, borderColor }]}>
+            <Text style={[styles.metricLabel, { color: subTextColor }]}>EFFICIENCY</Text>
+            <Text style={[styles.metricValue, { color: textColor }]}>91%</Text>
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>7-Day Sleep Trend</Text>
+        <View style={[styles.card, { backgroundColor: cardItemBg, borderColor }]}>
+          <Text style={[styles.cardTitle, { color: textColor }]}>7-Day Sleep Trend</Text>
           <View style={{ height: 140, marginVertical: 12 }}>
             <ChartScrubber
               data={sleepTrendData}
@@ -41,20 +50,20 @@ export default function SleepIntelligenceScreen() {
             />
           </View>
           <View style={styles.trendLabels}>
-            <Text style={styles.trendLabel}>M</Text>
-            <Text style={styles.trendLabel}>T</Text>
-            <Text style={styles.trendLabel}>W</Text>
-            <Text style={styles.trendLabel}>T</Text>
-            <Text style={styles.trendLabel}>F</Text>
-            <Text style={styles.trendLabel}>S</Text>
-            <Text style={[styles.trendLabel, styles.trendLabelActive]}>S</Text>
+            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+              <Text key={i} style={[
+                styles.trendLabel,
+                { color: subTextColor },
+                day === 'S' && { color: accentColor } // Example highlighting last one
+              ]}>{day}</Text>
+            ))}
           </View>
         </View>
 
-        <View style={styles.insightCard}>
-          <Text style={styles.insightTitle}>AI INSIGHT</Text>
-          <Text style={styles.insightText}>Deep sleep was 15% lower than your 30-day average.</Text>
-          <Text style={styles.insightDescription}>
+        <View style={[styles.insightCard, { borderColor: accentColor + '30', backgroundColor: cardColor + 'F0' }]}>
+          <Text style={[styles.insightTitle, { color: accentColor }]}>AI INSIGHT</Text>
+          <Text style={[styles.insightText, { color: textColor }]}>Deep sleep was 15% lower than your 30-day average.</Text>
+          <Text style={[styles.insightDescription, { color: subTextColor }]}>
             {"Your body's physical recovery may be slightly hindered. Try to avoid blue light exposure at least 60 minutes before your target sleep time tomorrow."}
           </Text>
         </View>
@@ -69,29 +78,6 @@ export default function SleepIntelligenceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F171A'
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
-  },
-  backButton: {
-    padding: 8
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    flex: 1,
-    textAlign: 'center'
-  },
-  shareButton: {
-    padding: 8
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -133,9 +119,7 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
     borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.5)',
     borderRadius: 20,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -144,18 +128,14 @@ const styles = StyleSheet.create({
   metricLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#8E8E93',
     marginBottom: 6
   },
   metricValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF'
   },
   card: {
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
     borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.5)',
     borderRadius: 24,
     padding: 20,
     marginBottom: 20
@@ -163,7 +143,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 12
   },
   trendLabels: {
@@ -175,15 +154,9 @@ const styles = StyleSheet.create({
   trendLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#8E8E93'
-  },
-  trendLabelActive: {
-    color: '#2DD4BF'
   },
   insightCard: {
-    backgroundColor: 'rgba(21, 28, 36, 0.8)',
     borderWidth: 1,
-    borderColor: 'rgba(45, 212, 191, 0.2)',
     borderRadius: 20,
     padding: 20,
     marginBottom: 24
@@ -191,54 +164,21 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#2DD4BF',
     letterSpacing: 1,
     marginBottom: 8
   },
   insightText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
     marginBottom: 12,
     lineHeight: 22
   },
   insightDescription: {
     fontSize: 14,
     fontWeight: '400',
-    color: '#8E8E93',
     lineHeight: 20
   },
   bottomSpacing: {
     height: 20
-  },
-  navBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: 'rgba(15, 23, 26, 0.9)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 16
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1
-  },
-  navItemActive: {
-  },
-  navLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.5
-  },
-  navLabelActive: {
-    color: '#2DD4BF'
   }
 });

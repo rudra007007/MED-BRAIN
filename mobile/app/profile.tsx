@@ -8,80 +8,118 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, LogOut } from 'lucide-react-native';
+import { ArrowLeft, LogOut, Sun, Moon, Smartphone } from 'lucide-react-native';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+
+  // Theme colors
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const subTextColor = useThemeColor({}, 'textSecondary');
+  const sectionTitleColor = useThemeColor({}, 'textSecondary'); // or textTertiary
+  const itemBg = useThemeColor({}, 'backgroundAccent'); // or backgroundCard
+  const borderColor = useThemeColor({}, 'border');
+  const iconColor = useThemeColor({}, 'tint');
 
   const handleSignOut = () => {
     router.replace('/onboarding/auth');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: borderColor }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#FFFFFF" />
+          <ArrowLeft size={24} color={textColor} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={[styles.headerTitle, { color: textColor }]}>Profile</Text>
         <View style={styles.headerSpace} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.profileSection}>
+        <View style={[styles.profileSection, { borderBottomColor: borderColor }]}>
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarText}>A</Text>
           </View>
-          <Text style={styles.profileName}>Alex Johnson</Text>
-          <Text style={styles.profileEmail}>alex@example.com</Text>
+          <Text style={[styles.profileName, { color: textColor }]}>Alex Johnson</Text>
+          <Text style={[styles.profileEmail, { color: subTextColor }]}>alex@example.com</Text>
+        </View>
+
+        {/* App Preferences Section */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>App Preferences</Text>
+
+          <View style={[styles.settingGroup, { backgroundColor: itemBg, borderColor, borderWidth: 1, borderRadius: 12, overflow: 'hidden' }]}>
+            <TouchableOpacity
+              style={[styles.settingItem, { borderBottomWidth: 1, borderBottomColor: borderColor }]}
+              onPress={() => setTheme('light')}
+            >
+              <View style={styles.settingRow}>
+                <Sun size={20} color={theme === 'light' ? '#F59E0B' : subTextColor} />
+                <Text style={[styles.settingLabel, { color: textColor }]}>Light Mode</Text>
+              </View>
+              {theme === 'light' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.settingItem, { borderBottomWidth: 1, borderBottomColor: borderColor }]}
+              onPress={() => setTheme('dark')}
+            >
+              <View style={styles.settingRow}>
+                <Moon size={20} color={theme === 'dark' ? '#13c8ec' : subTextColor} />
+                <Text style={[styles.settingLabel, { color: textColor }]}>Dark Mode</Text>
+              </View>
+              {theme === 'dark' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => setTheme('system')}
+            >
+              <View style={styles.settingRow}>
+                <Smartphone size={20} color={theme === 'system' ? '#10B981' : subTextColor} />
+                <Text style={[styles.settingLabel, { color: textColor }]}>System Default</Text>
+              </View>
+              {theme === 'system' && <View style={styles.activeDot} />}
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-          <TouchableOpacity style={styles.settingItem}>
+          <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>Account Settings</Text>
+          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
-              <Text style={styles.settingLabel}>Email Address</Text>
-              <Text style={styles.settingValue}>alex@example.com</Text>
+              <Text style={[styles.cardLabel, { color: textColor }]}>Email Address</Text>
+              <Text style={[styles.cardValue, { color: subTextColor }]}>alex@example.com</Text>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
-              <Text style={styles.settingLabel}>Phone Number</Text>
-              <Text style={styles.settingValue}>+1 (555) 123-4567</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View>
-              <Text style={styles.settingLabel}>Date of Birth</Text>
-              <Text style={styles.settingValue}>March 15, 1990</Text>
+              <Text style={[styles.cardLabel, { color: textColor }]}>Phone Number</Text>
+              <Text style={[styles.cardValue, { color: subTextColor }]}>+1 (555) 123-4567</Text>
             </View>
           </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Health Preferences</Text>
-          <TouchableOpacity style={styles.settingItem}>
+          <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>Health Preferences</Text>
+          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
-              <Text style={styles.settingLabel}>Notification Frequency</Text>
-              <Text style={styles.settingValue}>Daily</Text>
+              <Text style={[styles.cardLabel, { color: textColor }]}>Notification Frequency</Text>
+              <Text style={[styles.cardValue, { color: subTextColor }]}>Daily</Text>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity style={[styles.cardItem, { backgroundColor: itemBg, borderColor }]}>
             <View>
-              <Text style={styles.settingLabel}>Data Sharing</Text>
-              <Text style={styles.settingValue}>Enabled</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingItem}>
-            <View>
-              <Text style={styles.settingLabel}>Privacy Level</Text>
-              <Text style={styles.settingValue}>Standard</Text>
+              <Text style={[styles.cardLabel, { color: textColor }]}>Data Sharing</Text>
+              <Text style={[styles.cardValue, { color: subTextColor }]}>Enabled</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -100,7 +138,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F171A'
   },
   header: {
     flexDirection: 'row',
@@ -109,7 +146,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
   },
   backButton: {
     padding: 8,
@@ -121,7 +157,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
     flex: 1,
     textAlign: 'center'
   },
@@ -138,7 +173,6 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     paddingBottom: 24,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)'
   },
   avatarContainer: {
     width: 80,
@@ -157,12 +191,10 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginBottom: 4
   },
   profileEmail: {
     fontSize: 14,
-    color: '#8E8E93'
   },
   section: {
     marginBottom: 24
@@ -170,15 +202,36 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#8E8E93',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 12
   },
+  settingGroup: {
+    // Styles handled inline for dynamic colors
+  },
   settingItem: {
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  activeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#13c8ec',
+  },
+  cardItem: {
     borderWidth: 1,
-    borderColor: 'rgba(51, 65, 85, 0.5)',
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 16,
@@ -187,15 +240,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  settingLabel: {
+  cardLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
     marginBottom: 4
   },
-  settingValue: {
+  cardValue: {
     fontSize: 13,
-    color: '#8E8E93'
   },
   logoutButton: {
     backgroundColor: 'rgba(255, 59, 48, 0.1)',
@@ -218,35 +269,5 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 20
-  },
-  navBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: 'rgba(15, 23, 26, 0.9)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 16
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1
-  },
-  navItemActive: {
-  },
-  navLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.5
-  },
-  navLabelActive: {
-    color: '#2DD4BF'
   }
 });
