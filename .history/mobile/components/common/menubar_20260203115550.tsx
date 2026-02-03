@@ -33,7 +33,6 @@ export default function Menubar({ onClose }: MenubarProps) {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'dark'];
-  const { theme, setTheme } = useTheme();
 
   const [activeSettingsCategory, setActiveSettingsCategory] = useState<SettingsCategory>(null);
 
@@ -46,6 +45,7 @@ export default function Menubar({ onClose }: MenubarProps) {
   const [researchParticipation, setResearchParticipation] = useState(false);
   const [language] = useState('English');
   const [units, setUnits] = useState<'metric' | 'imperial'>('metric');
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
   const handleSettingsBack = () => {
     setActiveSettingsCategory(null);

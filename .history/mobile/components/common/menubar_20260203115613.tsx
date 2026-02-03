@@ -244,7 +244,7 @@ export default function Menubar({ onClose }: MenubarProps) {
         <TouchableOpacity
           key={t}
           style={[styles.optionItem, { backgroundColor: colors.backgroundCard }]}
-          onPress={() => setTheme(t as 'light' | 'dark' | 'system')}
+          onPress={() => setTheme(t)}
         >
           <View style={styles.optionRow}>
             {t === 'light' ? <Sun size={18} color={theme === t ? colors.accent : colors.text} /> : 
