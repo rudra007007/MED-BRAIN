@@ -9,36 +9,40 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 const MENU_WIDTH = Math.min(340, Math.round(Dimensions.get('window').width * 0.86));
 
 // Custom Tab Bar Component
-function FloatingTabBar() {
+function FloatingTabBar({ state, descriptors, navigation }: any) {
   const router = useRouter();
   const pathname = usePathname();
   const accentColor = useThemeColor({}, 'accent');
   
   const tabs = [
-    { name: 'index', path: '/', icon: Home, label: 'Home' },
-    { name: 'pattern-insights', path: '/pattern-insights', icon: BarChart3, label: 'Analysis' },
-    { name: 'ViewAnalysisScreen', path: '/ViewAnalysisScreen', icon: Bot, label: '', isCenter: true },
-    { name: 'community', path: '/community', icon: Users, label: 'Community' },
-    { name: 'notification', path: '/notification', icon: Bell, label: 'Updates' },
+    { name: 'index', icon: Home, label: 'Home' },
+    { name: 'pattern-insights', icon: BarChart3, label: 'Analysis' },
+    { name: 'ViewAnalysisScreen', icon: Bot, label: '', isCenter: true },
+    { name: 'community', icon: Users, label: 'Community' },
+    { name: 'notification', icon: Bell, label: 'Updates' },
   ];
 
-  const handlePress = (path: string) => {
-    router.replace(path as any);
+  const handlePress = (routeName: string) => {
+    if (routeName === 'index') {
+      router.replace('/(tabs)/index');
+    } else {
+      router.replace({ pathname: `/(tabs)/${routeName}` });
+    }
   };
 
   return (
     <View style={styles.floatingTabBar}>
       {tabs.map((tab) => {
-        const isActive = pathname === tab.path || 
-          (tab.path === '/' && (pathname === '/(tabs)' || pathname === '/')) ||
-          (pathname.includes(tab.name) && tab.name !== 'index');
+        const isActive = pathname.includes(tab.name) || 
+          (tab.name === 'index' && (pathname === '/(tabs)' || pathname === '/')) ||
+          (tab.name === 'ViewAnalysisScreen' && pathname.includes('ViewAnalysisScreen'));
         
         if (tab.isCenter) {
           return (
             <View key={tab.name} style={styles.centerTabWrapper}>
               <TouchableOpacity
                 style={[styles.centerButton, { backgroundColor: accentColor }]}
-                onPress={() => handlePress(tab.path)}
+                onPress={() => handlePress(tab.name)}
                 activeOpacity={0.8}
               >
                 <Bot size={28} color="#fff" />
@@ -51,7 +55,7 @@ function FloatingTabBar() {
           <TouchableOpacity
             key={tab.name}
             style={styles.tabItem}
-            onPress={() => handlePress(tab.path)}
+            onPress={() => handlePress(tab.name)}
             activeOpacity={0.6}
           >
             <View style={styles.iconWrapper}>
@@ -114,13 +118,13 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: { display: 'none' },
         }}
-        tabBar={() => <FloatingTabBar />}
+        tabBar={(props) => <FloatingTabBar {...props} />}
       >
-        <Tabs.Screen name="index" options={{ href: '/' }} />
-        <Tabs.Screen name="pattern-insights" options={{ href: '/pattern-insights' }} />
-        <Tabs.Screen name="ViewAnalysisScreen" options={{ href: '/ViewAnalysisScreen' }} />
-        <Tabs.Screen name="community" options={{ href: '/community' }} />
-        <Tabs.Screen name="notification" options={{ href: '/notification' }} />
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="pattern-insights" />
+        <Tabs.Screen name="ViewAnalysisScreen" />
+        <Tabs.Screen name="community" />
+        <Tabs.Screen name="notification" />
         <Tabs.Screen name="sleep-intelligence" options={{ href: null }} />
         <Tabs.Screen name="activity-detail" options={{ href: null }} />
         <Tabs.Screen name="recovery-signal" options={{ href: null }} />
