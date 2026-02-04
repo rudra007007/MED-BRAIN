@@ -1,0 +1,22 @@
+# Health Suggestion Microservice Dependencies
+
+# Web framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Data validation
+pydantic>=2.5.0
+
+# Configuration
+pyyaml>=6.0
+
+# Scientific computing
+numpy>=1.26.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+httpx>=0.26.0  # For FastAPI test client
+
+# Development utilities
+python-dotenv>=1.0.0

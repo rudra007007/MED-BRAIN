@@ -1,0 +1,26 @@
+# Health Suggestion Microservice Configuration
+
+app:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  log_level: "INFO"
+
+# Global health priors (cold start defaults)
+globals:
+  sleep:
+    min_hours: 7.0
+    max_hours: 9.0
+  screen_time:
+    max_hours: 8.0
+  activity:
+    min_minutes: 30
+
+# Analysis settings
+analysis:
+  # Phase thresholds (in days)
+  cold_start_days: 7
+  warm_up_days: 30
+  
+  # Confidence calculation
+  max_confidence_days: 30

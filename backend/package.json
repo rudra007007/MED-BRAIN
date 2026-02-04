@@ -1,24 +1,47 @@
 {
   "name": "med-brain-backend",
   "version": "1.0.0",
-  "description": "Backend API for preventive lifestyle health app",
-  "main": "server.js",
+  "description": "Production-ready backend for MED-BRAIN AI health application",
+  "type": "module",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "test": "jest",
+    "lint": "eslint src/"
   },
+  "keywords": [
+    "health",
+    "ai",
+    "metrics",
+    "prisma",
+    "express"
+  ],
+  "author": "MED-BRAIN Team",
+  "license": "MIT",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-validator": "^7.0.1",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^7.0.0",
-    "mongoose": "^8.0.3",
-    "uuid": "^9.0.1"
+    "express-async-errors": "^3.1.1",
+    "express-validator": "^7.0.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "prisma": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

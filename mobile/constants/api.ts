@@ -1,6 +1,6 @@
 // API Configuration
 // Update this to your backend URL in production
-export const API_BASE_URL = 'http://10.180.39.138:5000/api';
+export const API_BASE_URL = 'http://10.34.119.138:3000/api';
 
 export const API_ENDPOINTS = {
   // Auth

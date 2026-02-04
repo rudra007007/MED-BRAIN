@@ -32,15 +32,20 @@ export interface CommunityPost {
   isAnonymous: boolean;
   createdAt: string;
   updatedAt: string;
+  userReaction?: ReactionType | null;
 }
 
 export interface CommunityComment {
   id: string;
   postId: string;
   userId: string;
-  userAlias: string;
+  username?: string;
+  userAlias?: string;
   content: string;
   createdAt: string;
+  reactions?: { support: number };
+  userReaction?: boolean;
+  timestamp?: Date;
 }
 
 interface CommunityState {
@@ -59,9 +64,12 @@ interface CommunityState {
   // Actions
   fetchPosts: (params?: { page?: number; limit?: number; postType?: string }) => Promise<void>;
   createPost: (data: { postType: string; content: string; optionalMetrics?: any }) => Promise<void>;
-  addComment: (postId: string, content: string) => Promise<void>;
-  reactToPost: (postId: string, reactionType: ReactionType) => Promise<void>;
+  addComment: (comment: CommunityComment) => void;
+  reactToPost: (postId: string, reactionType: ReactionType) => void;
+  unreactToPost: (postId: string, reactionType: ReactionType) => void;
+  reactToComment: (commentId: string, postId: string) => void;
   removeReaction: (postId: string) => Promise<void>;
+  setPosts: (posts: CommunityPost[]) => void;
   setComments: (postId: string, comments: CommunityComment[]) => void;
   setSelectedPost: (postId: string | null) => void;
   clearError: () => void;
@@ -138,58 +146,64 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
     }
   },
 
-  addComment: async (postId, content) => {
-    try {
-      const response = await communityApi.addComment(postId, content);
-      if (response.success && response.data) {
-        set((state) => {
-          const postComments = state.comments[postId] || [];
-          return {
-            comments: {
-              ...state.comments,
-              [postId]: [...postComments, response.data],
-            },
-            posts: state.posts.map((post) => {
-              if (post.id === postId) {
-                return {
-                  ...post,
-                  comments: [...post.comments, response.data],
-                };
-              }
-              return post;
-            }),
-          };
-        });
-      } else {
-        set({ error: response.message || 'Failed to add comment' });
-      }
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Add comment failed',
-      });
-      throw error;
-    }
+  addComment: (comment: CommunityComment) => {
+    set((state) => {
+      const postComments = state.comments[comment.postId] || [];
+      return {
+        comments: {
+          ...state.comments,
+          [comment.postId]: [...postComments, comment],
+        },
+      };
+    });
   },
 
-  reactToPost: async (postId, reactionType) => {
-    try {
-      const response = await communityApi.addReaction(postId, reactionType);
-      if (response.success) {
-        set((state) => ({
-          posts: state.posts.map((post) => {
-            if (post.id === postId) {
-              return {
-                ...post,
-                reactions: response.data,
-              };
-            }
-            return post;
-          }),
-        }));
-      }
-    } catch (error) {
-      // Ignore reaction errors
-    }
+  reactToPost: (postId: string, reactionType: ReactionType) => {
+    set((state) => ({
+      posts: state.posts.map((post) => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            userReaction: reactionType,
+          };
+        }
+        return post;
+      }),
+    }));
+  },
+
+  unreactToPost: (postId: string, reactionType: ReactionType) => {
+    set((state) => ({
+      posts: state.posts.map((post) => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            userReaction: null,
+          };
+        }
+        return post;
+      }),
+    }));
+  },
+
+  reactToComment: (commentId: string, postId: string) => {
+    set((state) => ({
+      comments: {
+        ...state.comments,
+        [postId]: state.comments[postId].map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              userReaction: true,
+              reactions: {
+                support: (comment.reactions?.support || 0) + 1,
+              },
+            };
+          }
+          return comment;
+        }),
+      },
+    }));
   },
 
   removeReaction: async (postId) => {
@@ -211,6 +225,10 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
     } catch (error) {
       // Ignore reaction errors
     }
+  },
+
+  setPosts: (posts: CommunityPost[]) => {
+    set({ posts });
   },
 
   setComments: (postId, newComments) => set((state) => ({
